@@ -2,8 +2,9 @@
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
-import PrimeVue from 'primevue/config';
+import { RouterLink } from 'vue-router';
 
+import PrimeVue from 'primevue/config';
 import AutoComplete from 'primevue/autocomplete';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
@@ -37,7 +38,7 @@ import Dock from 'primevue/dock';
 import Dropdown from 'primevue/dropdown';
 import Fieldset from 'primevue/fieldset';
 import FileUpload from 'primevue/fileupload';
-//import FullCalendar from 'primevue/fullcalendar';
+import FullCalendar from 'primevue/fullcalendar';
 import Galleria from 'primevue/galleria';
 import InlineMessage from 'primevue/inlinemessage';
 import Inplace from 'primevue/inplace';
@@ -160,7 +161,7 @@ createInertiaApp({
     .directive('tooltip', Tooltip)
     .directive('badge', BadgeDirective)
     .directive('ripple', Ripple)
-    //.component('RouterLink', RouterLink)
+    .component('RouterLink', RouterLink)
     .component('Accordion', Accordion)
     .component('AccordionTab', AccordionTab)
     .component('AutoComplete', AutoComplete)
@@ -193,7 +194,7 @@ createInertiaApp({
     .component('Dropdown', Dropdown)
     .component('Fieldset', Fieldset)
     .component('FileUpload', FileUpload)
-    //.component('FullCalendar', FullCalendar)
+    .component('FullCalendar', FullCalendar)
     .component('InlineMessage', InlineMessage)
     .component('Inplace', Inplace)
     .component('InputMask', InputMask)
