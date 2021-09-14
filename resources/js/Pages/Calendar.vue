@@ -21,14 +21,14 @@ export default {
         AppLayout,
     },
     setup() {
-        onMounted(() => {
-            eventService.value.getEvents().then(data => {
-                events.value = data;
-                // console.log(data);
-                // console.log(eventService.value.getEvents());
-                // console.log(events.value);
-            });
-        })
+        // onMounted(() => {
+        //     eventService.value.getEvents().then(data => {
+        //         events.value = data;
+        //         // console.log(data);
+        //         // console.log(eventService.value.getEvents());
+        //         // console.log(events.value);
+        //     });
+        // })
 
         const calendarOptions =  ref({
             plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
