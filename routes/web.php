@@ -21,3 +21,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('HelloWorld');
 })->name('helloworld');
+
+Route::get('/calendar', function () {
+    return Inertia::render('Calendar');
+})->name('calendar');
