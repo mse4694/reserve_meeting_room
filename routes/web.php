@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\MeetingroomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,5 @@ Route::get('/', function () {
 Route::get('/calendar', function () {
     return Inertia::render('Calendar');
 })->name('calendar');
+
+Route::get('/sysadmin/manage_meeting_room', [MeetingroomController::class, 'index'])->name('manage_meeting_room');

@@ -380,9 +380,11 @@
           <span class="text-gray-700">การจัดการข้อมูล<i :class="managementMenuOpen ? iconExpland : iconCollapse" class="ml-2" style="fontSize: 0.7rem"></i></span>
         </div >
         <div :class="managementMenuOpen ? '' : 'hidden'">
-          <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
-            <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>ห้องประชุม</div>
-          </div>
+          <Link :href="route('manage_meeting_room')">
+            <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
+              <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>ห้องประชุม</div>
+            </div>
+          </Link>
           <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
             <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>สิทธิ์ผู้ใช้งาน</div>
           </div>

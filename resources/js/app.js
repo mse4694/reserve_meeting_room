@@ -113,6 +113,8 @@ import 'primevue/resources/themes/saga-blue/theme.css';   // theme
 import 'primevue/resources/primevue.min.css';             // core css
 import 'primeicons/primeicons.css';                       // icons
 
+import AppLayout from '@/Layouts/AppLayout.vue';
+
 //InertiaProgress.init()
 
 createInertiaApp({
@@ -259,6 +261,7 @@ createInertiaApp({
     .component('TreeTable', TreeTable)
     .component('TriStateCheckbox', TriStateCheckbox)
     .component('VirtualScroller', VirtualScroller)
+    .component('AppLayout', AppLayout)
     .mixin({ methods: { route: window.route } }) // enable route() on template
     .provide('emitter', emitter)
     .mount(el)
