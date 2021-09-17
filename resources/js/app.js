@@ -106,7 +106,8 @@ import TreeTable from 'primevue/treetable';
 import TriStateCheckbox from 'primevue/tristatecheckbox';
 import VirtualScroller from 'primevue/virtualscroller';
 
-import 'primevue/resources/themes/saga-blue/theme.css';   // theme
+import 'primevue/resources/themes/tailwind-light/theme.css';
+//import 'primevue/resources/themes/saga-blue/theme.css';   // theme
 //import 'primevue/resources/themes/vela-blue/theme.css';   // theme
 //import 'primevue/resources/themes/nova/theme.css';          // theme
 

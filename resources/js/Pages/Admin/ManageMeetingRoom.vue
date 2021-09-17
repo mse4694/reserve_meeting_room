@@ -10,10 +10,10 @@
                 </template>
             </Toolbar>
             <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
-            <DataTable ref="dt" :value="meetingRooms" v-model:selection="selectedMeetingRooms" dataKey="id" 
+            <DataTable ref="dt" :value="meetingRooms" v-model:selection="selectedMeetingRooms" dataKey="id" responsiveLayout="stack" breakpoint="960px"
                 :paginator="true" :rows="10" :filters="filters" :scrollable="true" scrollHeight="flex" stripedRows class="p-datatable-sm"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                currentPageReportTemplate="แสดง {first} ถึง {last} จากทั้งหมด {totalRecords}" responsiveLayout="scroll">
+                currentPageReportTemplate="แสดง {first} ถึง {last} จากทั้งหมด {totalRecords}">
                 <template #header>
                     <div class="flex flex-col md:flex-row items-center justify-between">
 						<h5 class="mb-2">จัดการห้องประชุม</h5>
@@ -24,28 +24,22 @@
 					</div>
                 </template>
 
-                <Column selectionMode="multiple" :exportable="false" />
-
-                <!-- <Column field="id" header="#" :sortable="true" style="max-width:3rem"></Column> -->
+                <Column selectionMode="multiple" :exportable="false" style="max-width:3rem"/>
 
                 <Column header="รูปห้อง" >
                      <template #body="slotProps">
-                        <img src="/storage/meeting_room.jpg" :alt="slotProps.data.image" class="meeting_room-image" />
+                        <img src="/storage/picture/no_image.jpg" :alt="slotProps.data.image" class="meeting_room-image" />
                     </template>
                 </Column>
 
-                <!-- <Column field="room_full_name" header="ชื่อเต็ม" :sortable="true" style="min-width:10rem"></Column> -->
-                <Column field="room_full_name" header="ชื่อเต็ม" :sortable="true" />
-                
-                <Column field="room_short_name" header="ชื่อย่อ" :sortable="true"  />
+                <Column field="fullname" header="ชื่อเต็ม" :sortable="true" />
+                <Column field="shortname" header="ชื่อย่อ" :sortable="true"  />
 
                 <Column field="building_id" header="สถานที่" :sortable="true" >
                     <template #body="slotProps">
                         <span>ตึก {{getBuildingName(slotProps.data.building_id).full_name}} ชั้น {{slotProps.data.floor}}</span>
                     </template>
                 </Column>
-
-                <!-- <Column field="room_size" header="รองรับคนได้" :sortable="true" /> -->
 
                 <Column field="status" header="สถานะ" :sortable="true" >
                     <template #body="slotProps">
@@ -55,174 +49,144 @@
 
                 <Column :exportable="false" >
                     <template #body="slotProps">
-                        <div class="mr-2"><Button icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-success" @click="editMeetingRoom(slotProps.data)"/></div>
+                        <div class="mr-1"><Button icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-success" @click="editMeetingRoom(slotProps.data)"/></div>
                         <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-warning" @click="confirmDeleteMeetingRoom(slotProps.data)"/></div>
                     </template>
                 </Column>
 
             </DataTable>
             <!-- </div> -->
+
+            <!-- สำหรับเพิ่มและแก้ไข ห้องประชุม -->
+            <Dialog v-model:visible="meetingRoomDialog" :style="{width: '450px'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid">
+                <div class="mt-4 mb-4">
+                    <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
+                    <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/>
+                    <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" />
+                 </div>
+                <div class="mb-4">
+                    <label for="room_full_name">ชื่อเต็มห้องประชุม</label>
+                    <InputText id="room_full_name" v-model.trim="mRoomForm.fullname" required="true" :class="{'p-invalid': submitted && !mRoomForm.fullname}" />
+                    <small class="p-error" v-if="submitted && !mRoomForm.fullname">จำเป็นต้องใส่ ชื่อเต็มห้องประชุม</small>
+                </div>
+
+                <div class="mb-4">
+                    <label for="room_short_name">ชื่อย่อห้องประชุม</label>
+                    <InputText id="room_short_name" v-model.trim="mRoomForm.shortname" required="true" :class="{'p-invalid': submitted && !mRoomForm.shortname}" />
+                    <small class="p-error" v-if="submitted && !mRoomForm.shortname">จำเป็นต้องใส่ ชื่อย่อห้องประชุม</small>
+                </div>
+
+                <div class="grid grid-cols-2 space-x-2 mb-4">
+                    <div>
+                        <label for="building">ตึก/อาคาร</label>
+                        <Dropdown id="building" v-model="mRoomForm.building_id" :options="building" optionLabel="full_name" placeholder="เลือกตึก/อาคาร" :class="{'p-invalid': submitted && !mRoomForm.building_id}">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value && slotProps.value.full_name">
+                                    <span>{{slotProps.value.full_name}}</span>
+                                </div>
+                                <div v-else-if="slotProps.value && !slotProps.value.full_name">
+                                    <span>{{getBuildingName(mRoomForm.building_id).full_name}}</span>
+                                </div>
+                                <span v-else>
+                                    {{slotProps.placeholder}}
+                                </span>
+                            </template>
+                        </Dropdown>
+                        <small class="p-error" v-if="submitted && !mRoomForm.building_id">จำเป็นต้องเลือก ตึก/อาคาร</small>
+                    </div>
+                    <div>
+                        <label for="floor">ชั้น</label>
+                        <InputNumber id="floor" v-model="mRoomForm.floor" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.floor}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.floor">จำเป็นต้องใส่ชั้น</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div>
+                        <label for="status">สถานะการใช้งาน</label>
+                        <Dropdown id="status" v-model="mRoomForm.status" :options="statuses" optionLabel="label" placeholder="เลือกสถานะ" :class="{'p-invalid': submitted && !mRoomForm.status}">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value && slotProps.value.value">
+                                    <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + slotProps.value.value.toLowerCase()">{{ slotProps.value.label }}</span>
+                                </div>
+                                <div v-else-if="slotProps.value && !slotProps.value.value">
+                                    <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + mRoomForm.status.toLowerCase()">{{ thaiStatus(mRoomForm.status).label }}</span>
+                                </div>
+                                <span v-else>
+                                    {{slotProps.placeholder}}
+                                </span>
+                            </template>
+                        </Dropdown>
+                        <small class="p-error" v-if="submitted && !mRoomForm.status">จำเป็นต้องเลือกสถานะการใช้งาน</small>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 space-x-2 mb-4">
+                    <div>
+                        <label for="capacity_normal">ความจุปกติ</label>
+                        <InputNumber id="capacity_normal" v-model="mRoomForm.capacity_normal" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_normal}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.capacity_normal">จำเป็นต้องใส่</small>
+                    </div>
+                    <div>
+                        <label for="capacity_min">ความจุน้อยสุด</label>
+                        <InputNumber id="capacity_min" v-model="mRoomForm.capacity_min" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_min}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.capacity_min">จำเป็นต้องใส่</small>
+                    </div>
+                    <div>
+                        <label for="capacity_max">ความจุมากสุด</label>
+                        <InputNumber id="capacity_max" v-model="mRoomForm.capacity_max" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_max}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.capacity_max">จำเป็นต้องใส่</small>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 space-x-2 mb-4">
+                    <div>
+                        <label for="price_half_day">ค่าจองครึ่งวัน</label>
+                        <InputNumber id="price_half_day" v-model="mRoomForm.price_half_day" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.price_half_day}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.price_half_day">จำเป็นต้องใส่</small>
+                    </div>
+                    <div>
+                        <label for="price_full_day">ค่าจองเต็มวัน</label>
+                        <InputNumber id="price_full_day" v-model="mRoomForm.price_full_day" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.price_full_day}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.price_full_day">จำเป็นต้องใส่</small>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label for="description">รายละเอียดเพิ่มเติม</label>
+                    <Textarea id="description" v-model="mRoomForm.description" required="true" rows="3" cols="20" />
+                </div>
+
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
+                    <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveMeetingRoom" />
+                </template>
+            </Dialog>
         </div>
-
-        <Dialog v-model:visible="deleteMeetingRoomsDialog" :style="{width: '450px'}" header="ยืนยัน" :modal="true">
-            <div class="flex items-center justify-center">
-                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="meetingRooms">คุณต้องการลบห้องประชุม ทั้งหมด ที่เลือกไว้ ?</span>
-            </div>
-            <template #footer>
-                <Button label="ไม่ใช่" icon="pi pi-times" @click="deleteMeetingRoomsDialog = false"/>
-                <Button label="ใช่" icon="pi pi-check" class="p-button-raised p-button-text p-button-danger" @click="deleteSelectedMeetingRooms" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteMeetingRoomDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
-            <div class="confirmation-content">
-                <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
-                <span v-if="meetingRoom">คุณต้องการลบห้องประชุม <b>{{meetingRoom.room_full_name}}</b>?</span>
-            </div>
-            <template #footer>
-                <Button label="ไม่" icon="pi pi-times" class="p-button-text" @click="deleteMeetingRoomDialog = false"/>
-                <Button label="ใช่" icon="pi pi-check" class="p-button-text" @click="deleteMeetingRoom" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="meetingRoomDialog" :style="{width: '450px'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid">
-            <img src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png" :alt="meetingRoom.image" class="meetingRoom-image" v-if="meetingRoom.image" />
-            <div v-if="!meetingRoom.value">
-                <img src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png" class="meetingRoom-image"/>
-            </div>
-            <div class="mb-4">
-                <label for="room_full_name">ชื่อเต็มห้องประชุม</label>
-                <InputText id="room_full_name" v-model.trim="meetingRoom.room_full_name" required="true" :class="{'p-invalid': submitted && !meetingRoom.room_full_name}" />
-                <small class="p-error" v-if="submitted && !meetingRoom.room_full_name">จำเป็นต้องใส่ ชื่อเต็มห้องประชุม</small>
-            </div>
-
-            <div class="mb-4">
-                <label for="room_short_name">ชื่อย่อห้องประชุม</label>
-                <InputText id="room_short_name" v-model.trim="meetingRoom.room_short_name" required="true" :class="{'p-invalid': submitted && !meetingRoom.room_short_name}" />
-                <small class="p-error" v-if="submitted && !meetingRoom.room_short_name">จำเป็นต้องใส่ ชื่อย่อห้องประชุม</small>
-            </div>
-
-            <div class="grid grid-cols-2 space-x-2 mb-4">
-                <div>
-                    <label for="building">ตึก/อาคาร</label>
-                    <Dropdown id="building" v-model="meetingRoom.building_id" :options="building" optionLabel="full_name" placeholder="เลือกตึก/อาคาร" :class="{'p-invalid': submitted && !meetingRoom.building_id}">
-                        <template #value="slotProps">
-                            <div v-if="slotProps.value && slotProps.value.full_name">
-                                <span>{{slotProps.value.full_name}}</span>
-                            </div>
-                            <div v-else-if="slotProps.value && !slotProps.value.full_name">
-                                <span>{{getBuildingName(meetingRoom.building_id).full_name}}</span>
-                            </div>
-                            <span v-else>
-                                {{slotProps.placeholder}}
-                            </span>
-                        </template>
-				    </Dropdown>
-                    <small class="p-error" v-if="submitted && !meetingRoom.building_id">จำเป็นต้องเลือก ตึก/อาคาร</small>
-                </div>
-                <div>
-                    <label for="floor">ชั้น</label>
-                    <InputNumber id="floor" v-model="meetingRoom.floor" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.floor}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.floor">จำเป็นต้องใส่ชั้น</small>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <div>
-                    <label for="status">สถานะการใช้งาน</label>
-                    <Dropdown id="status" v-model="meetingRoom.status" :options="statuses" optionLabel="label" placeholder="เลือกสถานะ" :class="{'p-invalid': submitted && !meetingRoom.status}">
-                        <template #value="slotProps">
-                            <div v-if="slotProps.value && slotProps.value.value">
-                                <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + slotProps.value.value.toLowerCase()">{{ slotProps.value.label }}</span>
-                            </div>
-                            <div v-else-if="slotProps.value && !slotProps.value.value">
-                                <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + meetingRoom.status.toLowerCase()">{{ thaiStatus(meetingRoom.status).label }}</span>
-                            </div>
-                            <span v-else>
-                                {{slotProps.placeholder}}
-                            </span>
-                        </template>
-				    </Dropdown>
-                    <small class="p-error" v-if="submitted && !meetingRoom.status">จำเป็นต้องเลือกสถานะการใช้งาน</small>
-                </div>
-                <!-- <div>
-                    <label for="room_size">รองรับผู้เข้าร่วมประชุม</label>
-                    <InputNumber id="room_size" v-model="meetingRoom.room_size" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.room_size}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.room_size">จำเป็นต้องใส่จำนวนคนที่รองรับ</small>
-                </div> -->
-            </div>
-
-            <div class="grid grid-cols-3 space-x-2 mb-4">
-                <div>
-                    <label for="capacity_normal">ความจุปกติ</label>
-                    <InputNumber id="capacity_normal" v-model="meetingRoom.capacity_normal" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.capacity_normal}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.capacity_normal">จำเป็นต้องใส่</small>
-                </div>
-                <div>
-                    <label for="capacity_min">ความจุน้อยสุด</label>
-                    <InputNumber id="capacity_min" v-model="meetingRoom.capacity_min" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.capacity_min}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.capacity_min">จำเป็นต้องใส่</small>
-                </div>
-                <div>
-                    <label for="capacity_max">ความจุมากสุด</label>
-                    <InputNumber id="capacity_max" v-model="meetingRoom.capacity_max" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.capacity_max}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.capacity_max">จำเป็นต้องใส่</small>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 space-x-2 mb-4">
-                <div>
-                    <label for="price_half_day">ค่าจองครึ่งวัน</label>
-                    <InputNumber id="price_half_day" v-model="meetingRoom.price_half_day" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.price_half_day}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.price_half_day">จำเป็นต้องใส่</small>
-                </div>
-                <div>
-                    <label for="price_full_day">ค่าจองเต็มวัน</label>
-                    <InputNumber id="price_full_day" v-model="meetingRoom.price_full_day" required="true" integeronly :class="{'p-invalid': submitted && !meetingRoom.price_full_day}" />
-                    <small class="p-error" v-if="submitted && !meetingRoom.price_full_day">จำเป็นต้องใส่</small>
-                </div>
-            </div>
-
-            <div class="mb-6">
-                <label for="description">รายละเอียดเพิ่มเติม</label>
-                <Textarea id="description" v-model="meetingRoom.description" required="true" rows="3" cols="20" />
-            </div>
-
-            <template #footer>
-                <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
-                <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveMeetingRoom" />
-            </template>
-        </Dialog>
-
-	</div>
-
+    </div>
     <Toast position="top-right" />
     </AppLayout>
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
+import { useForm } from '@inertiajs/inertia-vue3'
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from "primevue/usetoast";
 
-//import MeetingRoomService from '@/Services/MeetingRoomService';
+import MeetingRoomService from '@/Services/MeetingRoomService';
 
 export default {
-    // components: {
-    //     Toolbar, InputText, DataTable, Column, Dialog, useToast, Toast, Textarea, Dropdown, RadioButton, InputNumber  
-    // },
-
     setup() {
-        // onMounted(() => {
-        //     meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-        // })
+        onMounted(() => {
+            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+        })
 
         const toast = useToast();
         const dt = ref();
         const meetingRoom = ref({});
         const meetingRooms = ref([]);
-        //const meetingRoomService = ref(new MeetingRoomService());
+        const meetingRoomService = ref(new MeetingRoomService());
         const selectedMeetingRooms = ref();
         const meetingRoomDialog = ref(false);
         const submitted = ref(false);
@@ -232,27 +196,34 @@ export default {
         const deleteMeetingRoomDialog = ref(false);
         const deleteMeetingRoomsDialog = ref(false);
 
-        //const selectedBuilding = ref();
         const building = ref([
-            {id: 11, building_id: 1, full_name: 'อัษฎางค์', short_name: 'อฎ.'},
-	     	{id: 21, building_id: 2, full_name: 'นวมินทรบพิตรฯ', short_name: 'นว.'},
+            {id: 1, building_id: 1, full_name: 'อัษฎางค์', short_name: 'อฎ.'},
+	     	{id: 2, building_id: 2, full_name: 'นวมินทรบพิตรฯ', short_name: 'นว.'},
         ]);
 
-        // const building = ref([
-        //     {building_id: 1, full_name: 'อัษฎางค์'},
-	    //  	{building_id: 2, full_name: 'นวมินทรบพิตรฯ'},
-        // ]);
-
-        //const selectedStatus = ref();
         const statuses = ref([
 	     	{label: 'พร้อมใช้', value: 'READY'},
 	     	{label: 'ปรับปรุง', value: 'RENOVATE'},
             {label: 'ซ่อมแซม', value: 'REPAIR'},
         ]);
 
-        // const thaiStatus = computed( () => {
-            
-        // })
+        const mRoomForm = useForm({
+            id: null,
+            fullname: null,
+            shortname: null,
+            building_id: null,
+            floor: null,
+            status: null,
+            capacity_normal: null,
+            capacity_min: null,
+            capacity_max: null,
+            price_half_day: null,
+            price_full_day: null,
+            description: null,
+            image: null
+            //image: 'no_image.jpg'
+        });
+
         const thaiStatus = (inputStatus) => {
             return statuses.value.find(status=>status.value === inputStatus)
         };
@@ -287,7 +258,8 @@ export default {
         };
 
         const openNew = () => {
-            meetingRoom.value = {};
+            //meetingRoom.value = {};
+            mRoomForm.reset();
             submitted.value = false;
             meetingRoomDialog.value = true;
         };
@@ -301,61 +273,83 @@ export default {
             submitted.value = true;
             //console.log(meetingRoom.value)
             // ใช้ตรวจสอบตัวแปร ว่ามีข้อมูลกรอกเข้ามาหรือไม่ ซึ่งถ้าไม่มีข้อมูล จะขึ้นเป็น undefine
-            if(!(meetingRoom.value.room_full_name && meetingRoom.value.room_short_name 
-                && meetingRoom.value.building_id && meetingRoom.value.room_size && meetingRoom.value.status
-               )) {
+            // if(!(meetingRoom.value.room_full_name && meetingRoom.value.room_short_name 
+            //     && meetingRoom.value.building_id && meetingRoom.value.room_size && meetingRoom.value.status
+            //    )) {
+            if(! mRoomForm.fullname ) {
                 console.log('meetingRoom Object is missing some value');
             } else {
-                if(meetingRoom.value.id) {
+                if(mRoomForm.id) {
+                    console.log("Edit Data");
+                    addMroomDataToForm(meetingRoom)
                     meetingRoom.value.status = meetingRoom.value.status.value ? meetingRoom.value.status.value : meetingRoom.value.status;
                     meetingRoom.value.building_id = meetingRoom.value.building_id.building_id ? meetingRoom.value.building_id.building_id : meetingRoom.value.building_id;
-                    console.log("Edit Data");
-                    //console.log(meetingRoom.value.status);
-                    // console.log(meetingRoom.value.id);
-                    // console.log(findIndexById(meetingRoom.value.id));
-                    meetingRooms.value[findIndexById(meetingRoom.value.id)] = meetingRoom.value;
-                    //meetingRooms.value.splice(findIndexById(meetingRoom.value.id), 1, meetingRoom.value)
+                    meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
                     toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
-                    console.log(meetingRooms.value);
+                    mRoomForm.reset()
+                    console.log(meetingRooms);
                 } else {
-                    if(typeof meetingRoom.value.building_id === "object") {
-                        console.log("Add New Data");
-                        // ใช้ชั่วคราวสำหรับทดสอบ เพื่อเพิ่ม id ให้กับห้องประชุมที่ add เพิ่ม
-                        meetingRoom.value.id = parseInt(meetingRooms.value.length) + 1 
-                        meetingRoom.value.building_id = meetingRoom.value.building_id.building_id;
-                        meetingRoom.value.status = meetingRoom.value.status.value ? meetingRoom.value.status.value : 'READY';
-                        //console.log(meetingRoom.value);
-                        meetingRooms.value.push(meetingRoom.value);
-                        toast.add({severity:'success', summary: 'Successful', detail: 'เพิ่มข้อมูลห้องประชุมใหม่เรียบร้อย', life: 3000});
-                    }
+                    console.log("Add New Data");
+                    //console.log("Before add to form")
+                    //console.log(meetingRoom.value)
+                    //addMroomDataToForm(meetingRoom)
+                    // meetingRoom.value.building_id = meetingRoom.value.building_id.building_id;
+                    // meetingRoom.value.status = meetingRoom.value.status.value ? meetingRoom.value.status.value : 'READY';
+                    // meetingRoom.value.image = mRoomForm.image
+                    //console.log(mRoomForm)
+                    // ส่งข้อมูลไปที่ controller โดยใช้ form Helper
+                    mRoomForm.transform(data => ({
+                        ...data,
+                        building_id: data.building_id.building_id,
+                        status: data.status.value
+                    })).post(route('add_meeting_room'), {
+                        replace: true,
+                        onBefore: () => {
+                            // console.log("After add to form")
+                            // console.log(meetingRoom.value)
+                            //meetingRooms.value.push(meetingRoom.value);
+                            //console.log(meetingRooms.value)
+                        },
+                        onSuccess: (page) => {
+                            console.log(page)
+                            // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
+                            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                            toast.add({severity:'success', summary: 'Successful', detail: 'เพิ่มข้อมูลห้องประชุมใหม่เรียบร้อย', life: 3000}); 
+                            mRoomForm.reset()
+                        },
+                        onError: (errors) => {
+                            console.log(errors)
+                        },
+                        onFinish: () => {
+                            mRoomForm.processing = false 
+                        }
+                    });
                 }
                 meetingRoomDialog.value = false;
                 meetingRoom.value = {};
             }
+        };
 
-			// if (meetingRoom.value.room_full_name.trim()) {
-            //     if (meetingRoom.value.id) {
-            //         meetingRoom.value.inventoryStatus = meetingRoom.value.inventoryStatus.value ? meetingRoom.value.inventoryStatus.value : meetingRoom.value.inventoryStatus;
-            //         meetingRooms.value[findIndexById(meetingRoom.value.id)] = meetingRoom.value;
-            //         toast.add({severity:'success', summary: 'Successful', detail: 'meetingRoom Updated', life: 3000});
-            //     }
-            //     else {
-            //         meetingRoom.value.id = createId();
-            //         meetingRoom.value.code = createId();
-            //         meetingRoom.value.image = 'meetingRoom-placeholder.svg';
-            //         meetingRoom.value.inventoryStatus = meetingRoom.value.inventoryStatus ? meetingRoom.value.inventoryStatus.value : 'INSTOCK';
-            //         meetingRooms.value.push(meetingRoom.value);
-            //         toast.add({severity:'success', summary: 'Successful', detail: 'meetingRoom Created', life: 3000});
-            //     }
-
-            //     meetingRoomDialog.value = false;
-            //     meetingRoom.value = {};
-            // }
+        const addMroomDataToForm = (mRoom) => {
+            //const tempRoom = {...mRoom}
+            //console.log(mRoom.value)
+            mRoomForm.id = mRoom.value.id ? mRoom.value.id : null
+            mRoomForm.fullname = mRoom.value.fullname
+            mRoomForm.shortname = mRoom.value.shortname
+            mRoomForm.building_id = mRoom.value.building_id.building_id
+            mRoomForm.floor = mRoom.value.floor
+            mRoomForm.capacity_normal = mRoom.value.capacity_normal
+            mRoomForm.capacity_min = mRoom.value.capacity_min
+            mRoomForm.capacity_max = mRoom.value.capacity_max
+            mRoomForm.price_half_day = mRoom.value.price_half_day
+            mRoomForm.price_full_day = mRoom.value.price_full_day
+            mRoomForm.status = mRoom.value.status.value
+            mRoomForm.description = mRoom.value.description
+            mRoomForm.image = mRoom.value.image ? mRoom.value.image : mRoomForm.image
         };
 
         const editMeetingRoom = (mRoom) => {
             meetingRoom.value = {...mRoom};
-            console.log(meetingRoom.value)
             meetingRoomDialog.value = true;
         };
 
@@ -372,12 +366,13 @@ export default {
         };
 
         return { 
-            dt, meetingRooms, meetingRoom, 
+            dt, meetingRooms, meetingRoom, mRoomForm, 
             filters, submitted,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
             meetingRoomDialog, statuses, 
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
-            saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom  //Method
+            saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom,  //Method
+            addMroomDataToForm,  //Method
         }
     }
 }
