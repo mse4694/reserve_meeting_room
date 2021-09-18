@@ -1,169 +1,200 @@
 <template>
     <AppLayout>
-    <div class="card">
-        <div class="text-xl border-double border-b-2 border-opacity-25 border-blue-500 mt-2 mb-4 ml-2">ข้อมูลห้องประชุม</div>
-        <div class="ml-4 mr-4">
-            <Toolbar>
-                <template #left>
-                    <div class="px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
-                    <div><Button label="ลบ" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div>
-                </template>
-            </Toolbar>
-            <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
-            <DataTable ref="dt" :value="meetingRooms" v-model:selection="selectedMeetingRooms" dataKey="id" responsiveLayout="stack" breakpoint="960px"
-                :paginator="true" :rows="10" :filters="filters" :scrollable="true" scrollHeight="flex" stripedRows class="p-datatable-sm"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                currentPageReportTemplate="แสดง {first} ถึง {last} จากทั้งหมด {totalRecords}">
-                <template #header>
-                    <div class="flex flex-col md:flex-row items-center justify-between">
-						<h5 class="mb-2">จัดการห้องประชุม</h5>
-						<span class="p-input-icon-left">
-                            <i class="pi pi-search" />
-                            <InputText v-model="filters['global'].value" placeholder="Search..." />
-                        </span>
-					</div>
-                </template>
-
-                <Column selectionMode="multiple" :exportable="false" style="max-width:3rem"/>
-
-                <Column header="รูปห้อง" >
-                     <template #body="slotProps">
-                        <img src="/storage/picture/no_image.jpg" :alt="slotProps.data.image" class="meeting_room-image" />
+    <!-- <div class="card"> -->
+    <Card>
+        <template #header>
+            <div class="text-xl border-double border-b-2 border-opacity-25 border-blue-500 mt-2 mb-4 ml-2">ข้อมูลห้องประชุม</div>
+        </template>
+        <template #content>
+            <div class="ml-4 mr-4">
+                <Toolbar>
+                    <template #left>
+                        <div class="px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
+                        <div><Button label="ลบ" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div>
                     </template>
-                </Column>
-
-                <Column field="fullname" header="ชื่อเต็ม" :sortable="true" />
-                <Column field="shortname" header="ชื่อย่อ" :sortable="true"  />
-
-                <Column field="building_id" header="สถานที่" :sortable="true" >
-                    <template #body="slotProps">
-                        <span>ตึก {{getBuildingName(slotProps.data.building_id).full_name}} ชั้น {{slotProps.data.floor}}</span>
+                </Toolbar>
+                <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
+                <DataTable ref="dt" :value="meetingRooms" v-model:selection="selectedMeetingRooms" dataKey="id" responsiveLayout="stack" breakpoint="960px"
+                    :paginator="true" :rows="10" :filters="filters" :scrollable="true" scrollHeight="flex" stripedRows class="p-datatable-sm"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
+                    currentPageReportTemplate="แสดง {first} ถึง {last} จากทั้งหมด {totalRecords}">
+                    <template #header>
+                        <div class="flex flex-col md:flex-row items-center justify-between">
+                            <h5 class="mb-2">จัดการห้องประชุม</h5>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-search" />
+                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                            </span>
+                        </div>
                     </template>
-                </Column>
 
-                <Column field="status" header="สถานะ" :sortable="true" >
-                    <template #body="slotProps">
-                        <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + (slotProps.data.status ? slotProps.data.status.toLowerCase() : '')">{{ thaiStatus(slotProps.data.status).label }}</span>
+                    <Column selectionMode="multiple" :exportable="false" style="max-width:3rem"/>
+
+                    <Column header="รูปห้อง" >
+                        <template #body="slotProps">
+                            <img src="/storage/picture/no_image.jpg" :alt="slotProps.data.image" class="meeting_room-image" />
+                        </template>
+                    </Column>
+
+                    <Column field="fullname" header="ชื่อเต็ม" :sortable="true" />
+                    <Column field="shortname" header="ชื่อย่อ" :sortable="true"  />
+
+                    <Column field="building_id" header="สถานที่" :sortable="true" >
+                        <template #body="slotProps">
+                            <span>ตึก {{getBuildingName(slotProps.data.building_id).full_name}} ชั้น {{slotProps.data.floor}}</span>
+                        </template>
+                    </Column>
+
+                    <Column field="status" header="สถานะ" :sortable="true" >
+                        <template #body="slotProps">
+                            <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + (slotProps.data.status ? slotProps.data.status.toLowerCase() : '')">{{ thaiStatus(slotProps.data.status).label }}</span>
+                        </template>
+                    </Column>
+
+                    <Column :exportable="false" >
+                        <template #body="slotProps">
+                            <div class="mr-1"><Button icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-success" @click="editMeetingRoom(slotProps.data)"/></div>
+                            <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-warning" @click="confirmDeleteMeetingRoom(slotProps.data)"/></div>
+                        </template>
+                    </Column>
+
+                </DataTable>
+                <!-- </div> -->
+
+                <!-- สำหรับเพิ่มและแก้ไข ห้องประชุม -->
+                <!-- <Dialog v-model:visible="meetingRoomDialog" :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '450px'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid"> -->
+                <Dialog v-model:visible="meetingRoomDialog" :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '50vw'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid">
+                    <div class="mt-4 mb-4">
+                        <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
+                        <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/>
+                        <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="room_full_name">ชื่อเต็มห้องประชุม</label>
+                        <InputText id="room_full_name" v-model.trim="mRoomForm.fullname" required="true" :class="{'p-invalid': submitted && !mRoomForm.fullname}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.fullname">จำเป็นต้องใส่ ชื่อเต็มห้องประชุม</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="room_short_name">ชื่อย่อห้องประชุม</label>
+                        <InputText id="room_short_name" v-model.trim="mRoomForm.shortname" required="true" :class="{'p-invalid': submitted && !mRoomForm.shortname}" />
+                        <small class="p-error" v-if="submitted && !mRoomForm.shortname">จำเป็นต้องใส่ ชื่อย่อห้องประชุม</small>
+                    </div>
+
+                    <div class="grid grid-cols-2 space-x-2 mb-4">
+                        <div>
+                            <label for="building">ตึก/อาคาร</label>
+                            <Dropdown id="building" v-model="mRoomForm.building_id" :options="building" optionLabel="full_name" placeholder="เลือกตึก/อาคาร" :class="{'p-invalid': submitted && !mRoomForm.building_id}">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value && slotProps.value.full_name">
+                                        <span>{{slotProps.value.full_name}}</span>
+                                    </div>
+                                    <div v-else-if="slotProps.value && !slotProps.value.full_name">
+                                        <span>{{getBuildingName(mRoomForm.building_id).full_name}}</span>
+                                    </div>
+                                    <span v-else>
+                                        {{slotProps.placeholder}}
+                                    </span>
+                                </template>
+                            </Dropdown>
+                            <small class="p-error" v-if="submitted && !mRoomForm.building_id">จำเป็นต้องเลือก ตึก/อาคาร</small>
+                        </div>
+                        <div>
+                            <label for="floor">ชั้น</label>
+                            <InputNumber id="floor" v-model="mRoomForm.floor" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.floor}" />
+                            <small class="p-error" v-if="submitted && !mRoomForm.floor">จำเป็นต้องใส่ชั้น</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div>
+                            <label for="status">สถานะการใช้งาน</label>
+                            <Dropdown id="status" v-model="mRoomForm.status" :options="statuses" optionLabel="label" placeholder="เลือกสถานะ" :class="{'p-invalid': submitted && !mRoomForm.status}">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value && slotProps.value.value">
+                                        <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + slotProps.value.value.toLowerCase()">{{ slotProps.value.label }}</span>
+                                    </div>
+                                    <div v-else-if="slotProps.value && !slotProps.value.value">
+                                        <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + mRoomForm.status.toLowerCase()">{{ thaiStatus(mRoomForm.status).label }}</span>
+                                    </div>
+                                    <span v-else>
+                                        {{slotProps.placeholder}}
+                                    </span>
+                                </template>
+                            </Dropdown>
+                            <small class="p-error" v-if="submitted && !mRoomForm.status">จำเป็นต้องเลือกสถานะการใช้งาน</small>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 space-x-2 mb-4">
+                        <div>
+                            <label for="capacity_normal">ความจุปกติ</label>
+                            <InputNumber id="capacity_normal" v-model="mRoomForm.capacity_normal" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_normal}" />
+                            <small class="p-error" v-if="submitted && !mRoomForm.capacity_normal">จำเป็นต้องใส่</small>
+                        </div>
+                        <div>
+                            <label for="capacity_min">ความจุน้อยสุด</label>
+                            <InputNumber id="capacity_min" v-model="mRoomForm.capacity_min" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_min}" />
+                            <small class="p-error" v-if="submitted && !mRoomForm.capacity_min">จำเป็นต้องใส่</small>
+                        </div>
+                        <div>
+                            <label for="capacity_max">ความจุมากสุด</label>
+                            <InputNumber id="capacity_max" v-model="mRoomForm.capacity_max" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_max}" />
+                            <small class="p-error" v-if="submitted && !mRoomForm.capacity_max">จำเป็นต้องใส่</small>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 space-x-2 mb-4">
+                        <div>
+                            <label for="price_half_day">ค่าจองครึ่งวัน</label>
+                            <InputNumber id="price_half_day" v-model="mRoomForm.price_half_day" mode="currency" currency="THB" locale="th-TH" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.price_half_day}" />
+                            <small class="p-error" v-if="submitted && !mRoomForm.price_half_day">จำเป็นต้องใส่</small>
+                        </div>
+                        <div>
+                            <label for="price_full_day">ค่าจองเต็มวัน</label>
+                            <InputNumber id="price_full_day" v-model="mRoomForm.price_full_day" mode="currency" currency="THB" locale="th-TH" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.price_full_day}" />
+                            <small class="p-error" v-if="submitted && !mRoomForm.price_full_day">จำเป็นต้องใส่</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="description">รายละเอียดเพิ่มเติม</label>
+                        <Textarea id="description" v-model="mRoomForm.description" required="true" rows="3" cols="20" />
+                    </div>
+
+                    <template #footer>
+                        <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
+                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveMeetingRoom" />
                     </template>
-                </Column>
+                </Dialog>
 
-                <Column :exportable="false" >
-                    <template #body="slotProps">
-                        <div class="mr-1"><Button icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-success" @click="editMeetingRoom(slotProps.data)"/></div>
-                        <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-warning" @click="confirmDeleteMeetingRoom(slotProps.data)"/></div>
+                <!-- สำหรับลบห้องประชุมทีละหลายๆห้องจากปุ่มลบบน Header -->
+                <Dialog v-model:visible="deleteMeetingRoomsDialog" :style="{width: '450px'}" header="ยืนยัน" :modal="true">
+                    <div class="flex items-center justify-center">
+                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: #e65c00" />
+                        <span v-if="meetingRooms">คุณต้องการลบห้องประชุม ทั้งหมด ที่เลือกไว้ ?</span>
+                    </div>
+                    <template #footer>
+                        <Button label="ไม่ใช่" icon="pi pi-times" class="p-button-sm" @click="deleteMeetingRoomsDialog = false"/>
+                        <Button label="ใช่" icon="pi pi-check" class="p-button-raised p-button-text p-button-danger p-button-sm" @click="deleteSelectedMeetingRooms" />
                     </template>
-                </Column>
+                </Dialog>
 
-            </DataTable>
-            <!-- </div> -->
-
-            <!-- สำหรับเพิ่มและแก้ไข ห้องประชุม -->
-            <Dialog v-model:visible="meetingRoomDialog" :style="{width: '450px'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid">
-                <div class="mt-4 mb-4">
-                    <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
-                    <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/>
-                    <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" />
-                 </div>
-                <div class="mb-4">
-                    <label for="room_full_name">ชื่อเต็มห้องประชุม</label>
-                    <InputText id="room_full_name" v-model.trim="mRoomForm.fullname" required="true" :class="{'p-invalid': submitted && !mRoomForm.fullname}" />
-                    <small class="p-error" v-if="submitted && !mRoomForm.fullname">จำเป็นต้องใส่ ชื่อเต็มห้องประชุม</small>
-                </div>
-
-                <div class="mb-4">
-                    <label for="room_short_name">ชื่อย่อห้องประชุม</label>
-                    <InputText id="room_short_name" v-model.trim="mRoomForm.shortname" required="true" :class="{'p-invalid': submitted && !mRoomForm.shortname}" />
-                    <small class="p-error" v-if="submitted && !mRoomForm.shortname">จำเป็นต้องใส่ ชื่อย่อห้องประชุม</small>
-                </div>
-
-                <div class="grid grid-cols-2 space-x-2 mb-4">
-                    <div>
-                        <label for="building">ตึก/อาคาร</label>
-                        <Dropdown id="building" v-model="mRoomForm.building_id" :options="building" optionLabel="full_name" placeholder="เลือกตึก/อาคาร" :class="{'p-invalid': submitted && !mRoomForm.building_id}">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value && slotProps.value.full_name">
-                                    <span>{{slotProps.value.full_name}}</span>
-                                </div>
-                                <div v-else-if="slotProps.value && !slotProps.value.full_name">
-                                    <span>{{getBuildingName(mRoomForm.building_id).full_name}}</span>
-                                </div>
-                                <span v-else>
-                                    {{slotProps.placeholder}}
-                                </span>
-                            </template>
-                        </Dropdown>
-                        <small class="p-error" v-if="submitted && !mRoomForm.building_id">จำเป็นต้องเลือก ตึก/อาคาร</small>
+                <!-- สำหรับลบห้องประชุมจากปุ่มลบของ Row ตัวเอง-->
+                <Dialog v-model:visible="deleteMeetingRoomDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+                    <div class="confirmation-content">
+                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: #e65c00" />
+                        <span v-if="meetingRoom">คุณต้องการลบห้องประชุม <b>{{meetingRoom.fullname}}</b>?</span>
                     </div>
-                    <div>
-                        <label for="floor">ชั้น</label>
-                        <InputNumber id="floor" v-model="mRoomForm.floor" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.floor}" />
-                        <small class="p-error" v-if="submitted && !mRoomForm.floor">จำเป็นต้องใส่ชั้น</small>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <div>
-                        <label for="status">สถานะการใช้งาน</label>
-                        <Dropdown id="status" v-model="mRoomForm.status" :options="statuses" optionLabel="label" placeholder="เลือกสถานะ" :class="{'p-invalid': submitted && !mRoomForm.status}">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value && slotProps.value.value">
-                                    <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + slotProps.value.value.toLowerCase()">{{ slotProps.value.label }}</span>
-                                </div>
-                                <div v-else-if="slotProps.value && !slotProps.value.value">
-                                    <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + mRoomForm.status.toLowerCase()">{{ thaiStatus(mRoomForm.status).label }}</span>
-                                </div>
-                                <span v-else>
-                                    {{slotProps.placeholder}}
-                                </span>
-                            </template>
-                        </Dropdown>
-                        <small class="p-error" v-if="submitted && !mRoomForm.status">จำเป็นต้องเลือกสถานะการใช้งาน</small>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 space-x-2 mb-4">
-                    <div>
-                        <label for="capacity_normal">ความจุปกติ</label>
-                        <InputNumber id="capacity_normal" v-model="mRoomForm.capacity_normal" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_normal}" />
-                        <small class="p-error" v-if="submitted && !mRoomForm.capacity_normal">จำเป็นต้องใส่</small>
-                    </div>
-                    <div>
-                        <label for="capacity_min">ความจุน้อยสุด</label>
-                        <InputNumber id="capacity_min" v-model="mRoomForm.capacity_min" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_min}" />
-                        <small class="p-error" v-if="submitted && !mRoomForm.capacity_min">จำเป็นต้องใส่</small>
-                    </div>
-                    <div>
-                        <label for="capacity_max">ความจุมากสุด</label>
-                        <InputNumber id="capacity_max" v-model="mRoomForm.capacity_max" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.capacity_max}" />
-                        <small class="p-error" v-if="submitted && !mRoomForm.capacity_max">จำเป็นต้องใส่</small>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 space-x-2 mb-4">
-                    <div>
-                        <label for="price_half_day">ค่าจองครึ่งวัน</label>
-                        <InputNumber id="price_half_day" v-model="mRoomForm.price_half_day" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.price_half_day}" />
-                        <small class="p-error" v-if="submitted && !mRoomForm.price_half_day">จำเป็นต้องใส่</small>
-                    </div>
-                    <div>
-                        <label for="price_full_day">ค่าจองเต็มวัน</label>
-                        <InputNumber id="price_full_day" v-model="mRoomForm.price_full_day" required="true" integeronly :class="{'p-invalid': submitted && !mRoomForm.price_full_day}" />
-                        <small class="p-error" v-if="submitted && !mRoomForm.price_full_day">จำเป็นต้องใส่</small>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <label for="description">รายละเอียดเพิ่มเติม</label>
-                    <Textarea id="description" v-model="mRoomForm.description" required="true" rows="3" cols="20" />
-                </div>
-
-                <template #footer>
-                    <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
-                    <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveMeetingRoom" />
-                </template>
-            </Dialog>
-        </div>
-    </div>
+                    <template #footer>
+                        <Button label="ไม่ใช่" icon="pi pi-times" class="p-button-sm" @click="deleteMeetingRoomDialog = false"/>
+                        <Button label="ใช่" icon="pi pi-check" class="p-button-raised p-button-text p-button-danger p-button-sm" @click="deleteMeetingRoom" />
+                    </template>
+                </Dialog>
+            </div>
+        </template>
+    <!-- </div> -->
+    </Card>
     <Toast position="top-right" />
     </AppLayout>
 </template>
@@ -220,8 +251,7 @@ export default {
             price_half_day: null,
             price_full_day: null,
             description: null,
-            image: null
-            //image: 'no_image.jpg'
+            image: 'no_image.jpg'
         });
 
         const thaiStatus = (inputStatus) => {
@@ -229,7 +259,6 @@ export default {
         };
 
         const getBuildingName = (input_building_id) => {
-            //console.log("Input B id = " + input_building_id)
             return building.value.find(bname=>bname.building_id === input_building_id)
         };
 
@@ -237,8 +266,8 @@ export default {
             deleteMeetingRoomsDialog.value = true;
         };
 
-        const confirmDeleteMeetingRoom = (mtr) => {
-            meetingRoom.value = mtr;
+        const confirmDeleteMeetingRoom = (mRoom) => {
+            meetingRoom.value = mRoom;
             deleteMeetingRoomDialog.value = true;
         }
 
@@ -257,8 +286,14 @@ export default {
             toast.add({severity:'success', summary: 'Successful', detail: 'ห้องประชุมถูกลบเรียบร้อย', life: 3000});
         };
 
+        const editMeetingRoom = (mRoom) => {
+            meetingRoom.value = {...mRoom};
+            addMroomDataToForm(meetingRoom)
+            meetingRoomDialog.value = true;
+        };
+
         const openNew = () => {
-            //meetingRoom.value = {};
+            meetingRoom.value = {};
             mRoomForm.reset();
             submitted.value = false;
             meetingRoomDialog.value = true;
@@ -281,22 +316,28 @@ export default {
             } else {
                 if(mRoomForm.id) {
                     console.log("Edit Data");
-                    addMroomDataToForm(meetingRoom)
-                    meetingRoom.value.status = meetingRoom.value.status.value ? meetingRoom.value.status.value : meetingRoom.value.status;
-                    meetingRoom.value.building_id = meetingRoom.value.building_id.building_id ? meetingRoom.value.building_id.building_id : meetingRoom.value.building_id;
-                    meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
-                    toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
-                    mRoomForm.reset()
-                    console.log(meetingRooms);
+                    //meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
+                    mRoomForm.post(`/mroom/${mRoomForm.id}/update`, {
+                        replace: true,
+                        onBefore: () => {
+                        },
+                        onSuccess: (page) => {
+                            //console.log(page)
+                            // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
+                            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                            toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
+                        },
+                        onError: (errors) => {
+                            console.log(errors)
+                        },
+                        onFinish: () => {
+                            mRoomForm.processing = false 
+                        }
+                    });
+                    // toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
+                    // mRoomForm.reset()
                 } else {
                     console.log("Add New Data");
-                    //console.log("Before add to form")
-                    //console.log(meetingRoom.value)
-                    //addMroomDataToForm(meetingRoom)
-                    // meetingRoom.value.building_id = meetingRoom.value.building_id.building_id;
-                    // meetingRoom.value.status = meetingRoom.value.status.value ? meetingRoom.value.status.value : 'READY';
-                    // meetingRoom.value.image = mRoomForm.image
-                    //console.log(mRoomForm)
                     // ส่งข้อมูลไปที่ controller โดยใช้ form Helper
                     mRoomForm.transform(data => ({
                         ...data,
@@ -305,17 +346,12 @@ export default {
                     })).post(route('add_meeting_room'), {
                         replace: true,
                         onBefore: () => {
-                            // console.log("After add to form")
-                            // console.log(meetingRoom.value)
-                            //meetingRooms.value.push(meetingRoom.value);
-                            //console.log(meetingRooms.value)
                         },
                         onSuccess: (page) => {
-                            console.log(page)
+                            //console.log(page)
                             // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
                             meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
                             toast.add({severity:'success', summary: 'Successful', detail: 'เพิ่มข้อมูลห้องประชุมใหม่เรียบร้อย', life: 3000}); 
-                            mRoomForm.reset()
                         },
                         onError: (errors) => {
                             console.log(errors)
@@ -325,6 +361,8 @@ export default {
                         }
                     });
                 }
+                mRoomForm.reset()
+                submitted.value = false;
                 meetingRoomDialog.value = false;
                 meetingRoom.value = {};
             }
@@ -336,21 +374,16 @@ export default {
             mRoomForm.id = mRoom.value.id ? mRoom.value.id : null
             mRoomForm.fullname = mRoom.value.fullname
             mRoomForm.shortname = mRoom.value.shortname
-            mRoomForm.building_id = mRoom.value.building_id.building_id
+            mRoomForm.building_id = mRoom.value.building_id
             mRoomForm.floor = mRoom.value.floor
             mRoomForm.capacity_normal = mRoom.value.capacity_normal
             mRoomForm.capacity_min = mRoom.value.capacity_min
             mRoomForm.capacity_max = mRoom.value.capacity_max
             mRoomForm.price_half_day = mRoom.value.price_half_day
             mRoomForm.price_full_day = mRoom.value.price_full_day
-            mRoomForm.status = mRoom.value.status.value
+            mRoomForm.status = mRoom.value.status
             mRoomForm.description = mRoom.value.description
             mRoomForm.image = mRoom.value.image ? mRoom.value.image : mRoomForm.image
-        };
-
-        const editMeetingRoom = (mRoom) => {
-            meetingRoom.value = {...mRoom};
-            meetingRoomDialog.value = true;
         };
 
         const findIndexById = (id) => {

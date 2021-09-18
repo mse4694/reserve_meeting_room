@@ -30,3 +30,4 @@ Route::get('/calendar', function () {
 Route::get('/mroom/manage_meeting_room', [MeetingroomController::class, 'index'])->name('manage_meeting_room');
 Route::get('/mroom/showall', [MeetingroomController::class, 'showall'])->name('show_all_meeting_room');
 Route::post('/mroom/add', [MeetingroomController::class, 'store'])->name('add_meeting_room');
+Route::post('/mroom/{id}/update', [MeetingroomController::class, 'update'])->name('update_meeting_room');

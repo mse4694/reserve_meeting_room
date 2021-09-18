@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 use App\Models\Meetingroom;
-//use Illuminate\Support\Facades\DB;
+//use \Illuminate\Database\QueryException;
 //use Illuminate\Support\Facades\Auth;
 //use Illuminate\Http\Request;
 
@@ -39,20 +39,20 @@ class MeetingroomController extends Controller
      */
     public function store()
     {
-        dd( 
-             Request::input('fullname'),
-             Request::input('shortname'),
-             Request::input('building_id'),
-             Request::input('floor'),
-             Request::input('status'),
-             Request::input('capacity_normal'),
-             Request::input('capacity_min'),
-             Request::input('capacity_max'),
-             Request::input('price_half_day'),
-             Request::input('price_full_day'),
-             Request::input('description'),
-             Request::input('image'),
-        );
+        // dd( 
+        //      Request::input('fullname'),
+        //      Request::input('shortname'),
+        //      Request::input('building_id'),
+        //      Request::input('floor'),
+        //      Request::input('status'),
+        //      Request::input('capacity_normal'),
+        //      Request::input('capacity_min'),
+        //      Request::input('capacity_max'),
+        //      Request::input('price_half_day'),
+        //      Request::input('price_full_day'),
+        //      Request::input('description'),
+        //      Request::input('image'),
+        // );
 
         $building_id = Request::input('building_id');
         $floor = Request::input('floor');
@@ -60,17 +60,18 @@ class MeetingroomController extends Controller
         $price = ['half_day' => Request::input('price_half_day'), 'full_day' => Request::input('price_full_day')];
         $fullname = Request::input('fullname');
         $shortname = Request::input('shortname');
-        $description = Request::input('description');
+        //$description = Request::input('description');
+        $description = ['description'=>Request::input('description')];
         $status = Request::input('status');
         $userin = '10039018';
         $img_file = ['img1'=> Request::input('image')];
 
-        // $add_meeting_room = Meetingroom::create(['building_id'=>$building_id,'floor'=>$floor,
-        //                                         'capacity'=>$capacity,'price'=>$price,
-        //                                         'fullname'=>$fullname, 'shortname'=>$shortname,
-        //                                         'description'=>$description, 'status'=>$status,
-        //                                         'userin'=>$userin, 'img_file'=>$img_file 
-        //                                    ]);
+        $add_meeting_room = Meetingroom::create(['building_id'=>$building_id,'floor'=>$floor,
+                                                'capacity'=>$capacity,'price'=>$price,
+                                                'fullname'=>$fullname, 'shortname'=>$shortname,
+                                                'description'=>$description, 'status'=>$status,
+                                                'userin'=>$userin, 'img_file'=>$img_file 
+                                           ]);
 
         // if(!$add_meeting_room){
         //     $addStatus = "error";
@@ -111,7 +112,7 @@ class MeetingroomController extends Controller
                     'price_half_day'=>$mroom->price['half_day'],
                     'price_full_day'=>$mroom->price['full_day'],
                     'status'=>$mroom->status,
-                    'description'=>$mroom->description,
+                    'description'=>$mroom->description['description'],
                     'image'=>$mroom->img_file['img1'],
                 ];
             }
@@ -136,13 +137,76 @@ class MeetingroomController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        //
+        if(is_array(Request::input('building_id'))) {
+            $building_id = Request::input('building_id')['building_id'];
+        } else {
+            $building_id = Request::input('building_id');
+        }
+
+        if(is_array(Request::input('status'))) {
+            $status = Request::input('status')['value'];
+        } else {
+            $status = Request::input('status');
+        }
+
+        // dd( 
+        //     (int)$id,
+        //     Request::input('id'),
+        //     Request::input('fullname'),
+        //     Request::input('shortname'),
+        //     $building_id,
+        //     Request::input('floor'),
+        //     $status,
+        //     Request::input('capacity_normal'),
+        //     Request::input('capacity_min'),
+        //     Request::input('capacity_max'),
+        //     Request::input('price_half_day'),
+        //     Request::input('price_full_day'),
+        //     Request::input('description'),
+        //     Request::input('image'),
+        // );
+
+        //$building_id = Request::input('building_id');
+        $floor = Request::input('floor');
+        $capacity = ['normal' => Request::input('capacity_normal'), 'min' => Request::input('capacity_min'), 'max' => Request::input('capacity_max')];
+        $price = ['half_day' => Request::input('price_half_day'), 'full_day' => Request::input('price_full_day')];
+        $fullname = Request::input('fullname');
+        $shortname = Request::input('shortname');
+        //$description = Request::input('description');
+        $description = ['description'=>Request::input('description')];
+        //$status = Request::input('status');
+        $userin = '10039018';
+        $user_last_act = '10039019';
+        $img_file = ['img1'=> Request::input('image')];
+
+        try {
+            $upd_mroom = Meetingroom::whereId((int)$id)
+                                    ->update([
+                                        'building_id'=>$building_id,'floor'=>$floor,
+                                        'capacity'=>$capacity,'price'=>$price,
+                                        'fullname'=>$fullname, 'shortname'=>$shortname,
+                                        'description'=>$description, 'status'=>$status,
+                                        'userin'=>$userin, 'user_last_act'=>$user_last_act, 'img_file'=>$img_file 
+                                    ]);
+        } catch(\Exception  $e) {
+            // $updStatus = "error";
+            // $updDetail = "อัพเดทข้อมูลแพทย์ ไม่สำเร็จ";
+            // \Log::info($username .' !อัพเดทข้อมูลแพทย์ ที่ตาราง [preceptor] ID : ' . $id . ' ชื่อ : ' . $preceptor_name .' ไม่สำเร็จ!');
+            // \Log::info($e->message());
+            // DB::rollback();
+            // session([$updStatus => $updDetail]);
+            //return back()->withInput()->with('menuType', 'editPreceptor');
+            //return Redirect::route('manage_meeting_room');
+            \Log::info($e);
+            return Redirect::route('manage_meeting_room');
+        }
+
+        return Redirect::route('manage_meeting_room');
     }
 
     /**
