@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 use App\Models\Meetingroom;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 //use \Illuminate\Database\QueryException;
 //use Illuminate\Support\Facades\Auth;
 //use Illuminate\Http\Request;
@@ -60,18 +62,28 @@ class MeetingroomController extends Controller
         $price = ['half_day' => Request::input('price_half_day'), 'full_day' => Request::input('price_full_day')];
         $fullname = Request::input('fullname');
         $shortname = Request::input('shortname');
-        //$description = Request::input('description');
         $description = ['description'=>Request::input('description')];
         $status = Request::input('status');
         $userin = '10039018';
-        $img_file = ['img1'=> Request::file('image'),];
+        
 
-        $add_meeting_room = Meetingroom::create(['building_id'=>$building_id,'floor'=>$floor,
-                                                'capacity'=>$capacity,'price'=>$price,
-                                                'fullname'=>$fullname, 'shortname'=>$shortname,
-                                                'description'=>$description, 'status'=>$status,
-                                                'userin'=>$userin, 'img_file'=>$img_file 
-                                           ]);
+        try {
+            $uuid = (string) Str::uuid();
+            $imgName = $uuid.".jpg";
+            $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+            $img_file = ['img1'=> $imgName];
+
+            \Log::info($path);
+
+            Meetingroom::create(['building_id'=>$building_id,'floor'=>$floor,
+                                 'capacity'=>$capacity,'price'=>$price,
+                                 'fullname'=>$fullname, 'shortname'=>$shortname,
+                                 'description'=>$description, 'status'=>$status,
+                                 'userin'=>$userin, 'img_file'=>$img_file 
+                                ]);
+        } catch(\Exception  $e) {
+            \Log::info($e->message());
+        }
 
         // if(!$add_meeting_room){
         //     $addStatus = "error";
@@ -106,11 +118,11 @@ class MeetingroomController extends Controller
                     'fullname'=>$mroom->fullname,
                     'shortname'=>$mroom->shortname,
                     'floor'=>$mroom->floor,
-                    'capacity_normal'=>$mroom->capacity['normal'],
-                    'capacity_min'=>$mroom->capacity['min'],
-                    'capacity_max'=>$mroom->capacity['max'],
-                    'price_half_day'=>$mroom->price['half_day'],
-                    'price_full_day'=>$mroom->price['full_day'],
+                    'capacity_normal'=>(int)$mroom->capacity['normal'],
+                    'capacity_min'=>(int)$mroom->capacity['min'],
+                    'capacity_max'=>(int)$mroom->capacity['max'],
+                    'price_half_day'=>(int)$mroom->price['half_day'],
+                    'price_full_day'=>(int)$mroom->price['full_day'],
                     'status'=>$mroom->status,
                     'description'=>$mroom->description['description'],
                     'image'=>$mroom->img_file['img1'],
@@ -171,7 +183,8 @@ class MeetingroomController extends Controller
         //     Request::input('price_half_day'),
         //     Request::input('price_full_day'),
         //     Request::input('description'),
-        //     Request::input('image'),
+        //     //Request::input('image'),
+        //     Request::input('oldimage'),
         // );
 
         \Log::info(Request::all());
@@ -187,27 +200,67 @@ class MeetingroomController extends Controller
         //$status = Request::input('status');
         $userin = '10039018';
         $user_last_act = '10039019';
-        $img_file = ['img1'=> Request::input('image')];
+        $oldimage = Request::input('oldimage');
+        //$img_file = ['img1'=> Request::input('image')];
 
         try {
-            $upd_mroom = Meetingroom::whereId((int)$id)
-                                    ->update([
-                                        'building_id'=>$building_id,'floor'=>$floor,
-                                        'capacity'=>$capacity,'price'=>$price,
-                                        'fullname'=>$fullname, 'shortname'=>$shortname,
-                                        'description'=>$description, 'status'=>$status,
-                                        'userin'=>$userin, 'user_last_act'=>$user_last_act, 'img_file'=>$img_file 
-                                    ]);
+            // if( strcmp(Request::input('image'), "no_image.jpg") !== 0 ) {
+            //     if( strcmp($oldimage, "no_image.jpg") === 0 ) {
+            //         $uuid = (string) Str::uuid();
+            //         $imgName = $uuid.".jpg";
+            //         $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+            //     } else {
+            //         $imgName = $oldimage;
+            //         $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+            //     }
+            // } else {
+            //     $imgName = $oldimage;
+            // }
+
+            if( Request::hasFile('image') ) {
+                $uuid = (string) Str::uuid();
+                $imgName = $uuid.".jpg";
+                if( strcmp($oldimage, "no_image.jpg") === 0 ) {
+                    $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+                } else {
+                    Storage::delete('public/picture/'.$oldimage);
+                    $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+                }
+            } else {
+                if( strcmp($oldimage, "no_image.jpg") !== 0 ) {
+                    $imgName = $oldimage;
+                } else {
+                    $imgName = Request::input('image');
+                }
+            }
+
+
+            // if( strcmp($oldimage, "no_image.jpg") === 0 ) {
+            //     if( strcmp(Request::input('image'), "no_image.jpg") !== 0 ) {
+            //         $uuid = (string) Str::uuid();
+            //         $imgName = $uuid.".jpg";
+            //         $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+            //     }
+            // } else {
+            //     $imgName = $oldimage;
+            // }
+            
+            $img_file = ['img1'=> $imgName];
+
+            Meetingroom::whereId((int)$id)
+                        ->update([
+                            'building_id'=>$building_id,'floor'=>$floor,
+                            'capacity'=>$capacity,'price'=>$price,
+                            'fullname'=>$fullname, 'shortname'=>$shortname,
+                            'description'=>$description, 'status'=>$status,
+                            'userin'=>$userin, 'user_last_act'=>$user_last_act, 'img_file'=>$img_file 
+                        ]);
         } catch(\Exception  $e) {
-            // $updStatus = "error";
-            // $updDetail = "อัพเดทข้อมูลแพทย์ ไม่สำเร็จ";
-            // \Log::info($username .' !อัพเดทข้อมูลแพทย์ ที่ตาราง [preceptor] ID : ' . $id . ' ชื่อ : ' . $preceptor_name .' ไม่สำเร็จ!');
-            // \Log::info($e->message());
-            // DB::rollback();
+             \Log::info($e->message());
             // session([$updStatus => $updDetail]);
             //return back()->withInput()->with('menuType', 'editPreceptor');
-            //return Redirect::route('manage_meeting_room');
-            \Log::info($e);
+            //return Redirect::back()->withErrors(['msg' => 'The Message']);
+            //\Log::info($e);
             return Redirect::route('manage_meeting_room');
         }
 

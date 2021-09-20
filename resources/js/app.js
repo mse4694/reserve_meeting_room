@@ -49,6 +49,7 @@ import Fieldset from 'primevue/fieldset';
 import FileUpload from 'primevue/fileupload';
 import FullCalendar from 'primevue/fullcalendar';
 import Galleria from 'primevue/galleria';
+import Image from 'primevue/image';
 import InlineMessage from 'primevue/inlinemessage';
 import Inplace from 'primevue/inplace';
 import InputSwitch from 'primevue/inputswitch';
@@ -106,8 +107,9 @@ import TreeTable from 'primevue/treetable';
 import TriStateCheckbox from 'primevue/tristatecheckbox';
 import VirtualScroller from 'primevue/virtualscroller';
 
+import 'primevue/resources/themes/med/theme.css';   // theme
 //import 'primevue/resources/themes/fluent-light/theme.css';   // theme
-import 'primevue/resources/themes/tailwind-light/theme.css';  // theme
+//import 'primevue/resources/themes/tailwind-light/theme.css';  // theme
 //import 'primevue/resources/themes/mdc-light-indigo/theme.css';  // theme
 //import 'primevue/resources/themes/saga-blue/theme.css';   // theme
 //import 'primevue/resources/themes/vela-blue/theme.css';   // theme
@@ -209,6 +211,7 @@ createInertiaApp({
     .component('Fieldset', Fieldset)
     .component('FileUpload', FileUpload)
     .component('FullCalendar', FullCalendar)
+    .component('Image', Image)
     .component('InlineMessage', InlineMessage)
     .component('Inplace', Inplace)
     .component('InputMask', InputMask)

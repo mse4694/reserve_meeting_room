@@ -32,7 +32,8 @@
 
                     <Column header="รูปห้อง" >
                         <template #body="slotProps">
-                            <img src="/storage/picture/no_image.jpg" :alt="slotProps.data.image" class="meeting_room-image" />
+                            <Image :src="`/storage/picture/${slotProps.data.image}`" :alt="slotProps.data.image" class="meeting_room-image" preview />
+                            <!-- <img :src="`/storage/picture/${slotProps.data.image}`" :alt="slotProps.data.image" class="meeting_room-image" /> -->
                         </template>
                     </Column>
 
@@ -70,29 +71,15 @@
                         <!-- <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" /> -->
                         <div>
                             <!-- <label for="File">เพิ่ม/แก้ไขภาพ</label> -->
-                            <i class="pi pi-camera"></i>
+                            <!-- <i class="pi pi-camera"></i> -->
                             <input
                                 type="file"
                                 @input="mRoomForm.image = $event.target.files[0]"
                                 @change="previewImage"
                                 ref="photo"
-                                class="
-                                    w-full
-                                    px-4
-                                    py-2
-                                    mt-2
-                                    border
-                                    rounded-md
-                                    focus:outline-none
-                                    focus:ring-1
-                                    focus:ring-blue-600
-                                "
+                                class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                             />
-                            <img
-                                v-if="url"
-                                :src="url"
-                                class="w-full mt-4 h-80"
-                            />
+                            <img v-if="url" :src="url" class="w-full mt-4 h-80"/>
                             <div
                                 v-if="errors.image"
                                 class="font-bold text-red-600"
@@ -371,6 +358,7 @@ export default {
                     //meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
                     mRoomForm.transform(data => ({
                         ...data,
+                        oldimage: meetingRoom.value.image
                         // building_id: data.building_id.building_id,
                         // status: data.status.value
                     })).post(`/mroom/${mRoomForm.id}/update`, {
@@ -419,7 +407,7 @@ export default {
                         }
                     });
                 }
-                console.log(mRoomForm.image)
+                //console.log(mRoomForm.image)
                 mRoomForm.reset()
                 submitted.value = false;
                 meetingRoomDialog.value = false;
@@ -486,7 +474,8 @@ export default {
 <style scoped>
 
 .meeting_room-image {
-    width: 100px;
+    width: 70px;
+    height: 40px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 

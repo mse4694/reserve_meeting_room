@@ -6,6 +6,19 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ asset(mix('/css/app.css')) }}" rel="stylesheet" />
     <script src="{{ asset(mix('/js/app.js')) }}" defer></script>
+
+    <style>
+      @font-face {
+         font-family: 'Sarabun';
+         src: url("{{ asset('fonts/Sarabun-Regular.ttf') }}");
+       }
+       body {
+         font-family: 'Sarabun';
+         /* background-color: #FCFCFC; */
+        
+       }
+ 
+     </style>
   </head>
   <body>
     @routes
