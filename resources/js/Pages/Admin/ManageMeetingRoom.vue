@@ -66,8 +66,49 @@
                 <Dialog v-model:visible="meetingRoomDialog" :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '50vw'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid">
                     <div class="mt-4 mb-4">
                         <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
-                        <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/>
-                        <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" />
+                        <!-- <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/> -->
+                        <!-- <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" /> -->
+                        <div>
+                            <!-- <label for="File">เพิ่ม/แก้ไขภาพ</label> -->
+                            <i class="pi pi-camera"></i>
+                            <input
+                                type="file"
+                                @input="mRoomForm.image = $event.target.files[0]"
+                                @change="previewImage"
+                                ref="photo"
+                                class="
+                                    w-full
+                                    px-4
+                                    py-2
+                                    mt-2
+                                    border
+                                    rounded-md
+                                    focus:outline-none
+                                    focus:ring-1
+                                    focus:ring-blue-600
+                                "
+                            />
+                            <img
+                                v-if="url"
+                                :src="url"
+                                class="w-full mt-4 h-80"
+                            />
+                            <div
+                                v-if="errors.image"
+                                class="font-bold text-red-600"
+                            >
+                                {{ errors.image }}
+                            </div>
+                        </div>
+                        <!-- <div class="mb-4 px-4">
+                            <input type="file" accept="image/*.jpg" @input="mRoomForm.image = $event.target.files[0]" ref="photo" class="hidden" @change="previewImage">
+                            <div class="relative inline-block">
+                                <img v-if="url" :src="url" :alt="mRoomForm.image" class="w-full rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 object-cover">
+                                <div class="absolute top-0 w-full h-full flex items-center justify-center">
+                                    <button @click="browseImg" class="rounded-full hover:bg-white hover:bg-opacity-25 p-2 focus:outline-none"><i class="pi pi-camera"></i></button>
+                                </div>
+                            </div>
+                        </div> -->
                     </div>
                     <div class="mb-4">
                         <label for="room_full_name">ชื่อเต็มห้องประชุม</label>
@@ -208,6 +249,10 @@ import { useToast } from "primevue/usetoast";
 import MeetingRoomService from '@/Services/MeetingRoomService';
 
 export default {
+    props: {
+        errors: Object,
+    },
+
     setup() {
         onMounted(() => {
             meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
@@ -253,6 +298,7 @@ export default {
             description: null,
             image: 'no_image.jpg'
         });
+        const url = ref(null);
 
         const thaiStatus = (inputStatus) => {
             return statuses.value.find(status=>status.value === inputStatus)
@@ -288,18 +334,24 @@ export default {
 
         const editMeetingRoom = (mRoom) => {
             meetingRoom.value = {...mRoom};
+            //mRoomForm.reset();
             addMroomDataToForm(meetingRoom)
+            url.value = `${base_url}/storage/picture/${mRoomForm.image}`
+            //url.value = mRoomForm.image
+            console.log(url.value)
             meetingRoomDialog.value = true;
         };
 
         const openNew = () => {
             meetingRoom.value = {};
-            mRoomForm.reset();
+            url.value = null;
             submitted.value = false;
             meetingRoomDialog.value = true;
         };
 
         const hideDialog = () => {
+            mRoomForm.reset();
+            url.value = null;
             meetingRoomDialog.value = false;
             submitted.value = false;
         };
@@ -317,10 +369,14 @@ export default {
                 if(mRoomForm.id) {
                     console.log("Edit Data");
                     //meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
-                    mRoomForm.post(`/mroom/${mRoomForm.id}/update`, {
-                        replace: true,
-                        onBefore: () => {
-                        },
+                    mRoomForm.transform(data => ({
+                        ...data,
+                        // building_id: data.building_id.building_id,
+                        // status: data.status.value
+                    })).post(`/mroom/${mRoomForm.id}/update`, {
+                        // replace: true,
+                        // onBefore: () => {
+                        // },
                         onSuccess: (page) => {
                             //console.log(page)
                             // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
@@ -342,8 +398,10 @@ export default {
                     mRoomForm.transform(data => ({
                         ...data,
                         building_id: data.building_id.building_id,
-                        status: data.status.value
+                        status: data.status.value,
+                        image: data.image
                     })).post(route('add_meeting_room'), {
+                        forceFormData: true,
                         replace: true,
                         onBefore: () => {
                         },
@@ -361,6 +419,7 @@ export default {
                         }
                     });
                 }
+                console.log(mRoomForm.image)
                 mRoomForm.reset()
                 submitted.value = false;
                 meetingRoomDialog.value = false;
@@ -384,7 +443,20 @@ export default {
             mRoomForm.status = mRoom.value.status
             mRoomForm.description = mRoom.value.description
             mRoomForm.image = mRoom.value.image ? mRoom.value.image : mRoomForm.image
+
+            // console.log(mRoomForm.building_id)
+            // console.log(mRoomForm.status)
         };
+
+        const previewImage = (e) => {
+            const file = e.target.files[0];
+            url.value = URL.createObjectURL(file);
+            console.log(url.value)
+        };
+
+        // const browseImg = () => {
+        //     this.$refs.photo.click();
+        // };
 
         const findIndexById = (id) => {
             let index = -1;
@@ -399,13 +471,13 @@ export default {
         };
 
         return { 
-            dt, meetingRooms, meetingRoom, mRoomForm, 
+            dt, meetingRooms, meetingRoom, mRoomForm, url, 
             filters, submitted,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
             meetingRoomDialog, statuses, 
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
             saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom,  //Method
-            addMroomDataToForm,  //Method
+            addMroomDataToForm, previewImage,  //Method
         }
     }
 }

@@ -51,9 +51,13 @@
 
 <script>
 import { ref } from 'vue'
+
 export default {
+    components: {
+    },
     emits: ['toggleSidebar'],
     setup() {
+        
         const dropDownOpen = ref(false);
 
         return {

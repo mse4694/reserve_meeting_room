@@ -10,5 +10,9 @@
   <body>
     @routes
     @inertia
+
+    <script>
+      const base_url = "{{ env('APP_URL') }}";
+    </script>
   </body>
 </html>

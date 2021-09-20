@@ -51,7 +51,7 @@ class MeetingroomController extends Controller
         //      Request::input('price_half_day'),
         //      Request::input('price_full_day'),
         //      Request::input('description'),
-        //      Request::input('image'),
+        //      Request::file('image'),
         // );
 
         $building_id = Request::input('building_id');
@@ -64,7 +64,7 @@ class MeetingroomController extends Controller
         $description = ['description'=>Request::input('description')];
         $status = Request::input('status');
         $userin = '10039018';
-        $img_file = ['img1'=> Request::input('image')];
+        $img_file = ['img1'=> Request::file('image'),];
 
         $add_meeting_room = Meetingroom::create(['building_id'=>$building_id,'floor'=>$floor,
                                                 'capacity'=>$capacity,'price'=>$price,
@@ -120,6 +120,7 @@ class MeetingroomController extends Controller
             //\Log::info("No room");
             $mrooms_tranform = [];
         }
+        //\Log::info($mrooms_tranform);
         return $mrooms_tranform;
     }
 
@@ -159,8 +160,10 @@ class MeetingroomController extends Controller
         //     Request::input('id'),
         //     Request::input('fullname'),
         //     Request::input('shortname'),
+        //     // Request::input('building_id'),
         //     $building_id,
         //     Request::input('floor'),
+        //     // Request::input('status'),
         //     $status,
         //     Request::input('capacity_normal'),
         //     Request::input('capacity_min'),
@@ -170,6 +173,8 @@ class MeetingroomController extends Controller
         //     Request::input('description'),
         //     Request::input('image'),
         // );
+
+        \Log::info(Request::all());
 
         //$building_id = Request::input('building_id');
         $floor = Request::input('floor');
