@@ -10,15 +10,13 @@
     <style>
       @font-face {
          font-family: 'Sarabun';
-         src: url("{{ asset('fonts/Sarabun-Regular.ttf') }}");
+         src: url("{{ asset('fonts/vendor/primevue/resources/themes/med/Sarabun-Regular.ttf') }}");
        }
        body {
          font-family: 'Sarabun';
          /* background-color: #FCFCFC; */
-        
        }
- 
-     </style>
+    </style>
   </head>
   <body>
     @routes

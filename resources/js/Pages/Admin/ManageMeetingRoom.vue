@@ -2,9 +2,9 @@
     <AppLayout>
     <!-- <div class="card"> -->
     <Card>
-        <template #header>
+        <!-- <template #header>
             <div class="text-xl border-double border-b-2 border-opacity-25 border-blue-500 mt-2 mb-4 ml-2">ข้อมูลห้องประชุม</div>
-        </template>
+        </template> -->
         <template #content>
             <div class="ml-4 mr-4">
                 <Toolbar>
@@ -32,7 +32,7 @@
 
                     <Column header="รูปห้อง" >
                         <template #body="slotProps">
-                            <Image :src="`/storage/picture/${slotProps.data.image}`" :alt="slotProps.data.image" class="meeting_room-image" preview />
+                            <Image :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image1" class="meeting_room-image" preview />
                             <!-- <img :src="`/storage/picture/${slotProps.data.image}`" :alt="slotProps.data.image" class="meeting_room-image" /> -->
                         </template>
                     </Column>
@@ -69,22 +69,56 @@
                         <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
                         <!-- <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/> -->
                         <!-- <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" /> -->
-                        <div>
-                            <!-- <label for="File">เพิ่ม/แก้ไขภาพ</label> -->
-                            <!-- <i class="pi pi-camera"></i> -->
-                            <input
-                                type="file"
-                                @input="mRoomForm.image = $event.target.files[0]"
-                                @change="previewImage"
-                                ref="photo"
-                                class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-                            />
-                            <img v-if="url" :src="url" class="w-full mt-4 h-80"/>
-                            <div
-                                v-if="errors.image"
-                                class="font-bold text-red-600"
-                            >
-                                {{ errors.image }}
+                        <div class="grid grid-cols-1 sm:grid-cols-3 space-x-2 mb-4">
+                            <div>
+                                <!-- <label for="File">เพิ่ม/แก้ไขภาพ</label> -->
+                                <!-- <i class="pi pi-camera"></i> -->
+                                <input
+                                    type="file"
+                                    @input="mRoomForm.image1 = $event.target.files[0]"
+                                    @change="previewImage1"
+                                    ref="photo1"
+                                    class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                />
+                                <img v-if="url1" :src="url1" class="w-30 mt-4 h-20"/>
+                                <div
+                                    v-if="errors.image1"
+                                    class="font-bold text-red-600"
+                                >
+                                    {{ errors.image1 }}
+                                </div>
+                            </div>
+                            <div>
+                                <input
+                                    type="file"
+                                    @input="mRoomForm.image2 = $event.target.files[0]"
+                                    @change="previewImage2"
+                                    ref="photo2"
+                                    class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                />
+                                <img v-if="url2" :src="url2" class="w-30 mt-4 h-20"/>
+                                <div
+                                    v-if="errors.image2"
+                                    class="font-bold text-red-600"
+                                >
+                                    {{ errors.image2 }}
+                                </div>
+                            </div>
+                            <div>
+                                <input
+                                    type="file"
+                                    @input="mRoomForm.image3 = $event.target.files[0]"
+                                    @change="previewImage3"
+                                    ref="photo3"
+                                    class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                />
+                                <img v-if="url3" :src="url3" class="w-30 mt-4 h-20"/>
+                                <div
+                                    v-if="errors.image3"
+                                    class="font-bold text-red-600"
+                                >
+                                    {{ errors.image3 }}
+                                </div>
                             </div>
                         </div>
                         <!-- <div class="mb-4 px-4">
@@ -283,9 +317,13 @@ export default {
             price_half_day: null,
             price_full_day: null,
             description: null,
-            image: 'no_image.jpg'
+            image1: 'no_image.jpg',
+            image2: 'no_image.jpg',
+            image3: 'no_image.jpg'
         });
-        const url = ref(null);
+        const url1 = ref(null);
+        const url2 = ref(null);
+        const url3 = ref(null);
 
         const thaiStatus = (inputStatus) => {
             return statuses.value.find(status=>status.value === inputStatus)
@@ -323,22 +361,28 @@ export default {
             meetingRoom.value = {...mRoom};
             //mRoomForm.reset();
             addMroomDataToForm(meetingRoom)
-            url.value = `${base_url}/storage/picture/${mRoomForm.image}`
+            url1.value = `${base_url}/storage/picture/${mRoomForm.image1}`
+            url2.value = `${base_url}/storage/picture/${mRoomForm.image2}`
+            url3.value = `${base_url}/storage/picture/${mRoomForm.image3}`
             //url.value = mRoomForm.image
-            console.log(url.value)
+            console.log(url1.value)
             meetingRoomDialog.value = true;
         };
 
         const openNew = () => {
             meetingRoom.value = {};
-            url.value = null;
+            url1.value = null;
+            url2.value = null;
+            url3.value = null;
             submitted.value = false;
             meetingRoomDialog.value = true;
         };
 
         const hideDialog = () => {
             mRoomForm.reset();
-            url.value = null;
+            url1.value = null;
+            url2.value = null;
+            url3.value = null;
             meetingRoomDialog.value = false;
             submitted.value = false;
         };
@@ -358,7 +402,9 @@ export default {
                     //meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
                     mRoomForm.transform(data => ({
                         ...data,
-                        oldimage: meetingRoom.value.image
+                        oldimage1: meetingRoom.value.image1,
+                        oldimage2: meetingRoom.value.image2,
+                        oldimage3: meetingRoom.value.image3
                         // building_id: data.building_id.building_id,
                         // status: data.status.value
                     })).post(`/mroom/${mRoomForm.id}/update`, {
@@ -387,7 +433,9 @@ export default {
                         ...data,
                         building_id: data.building_id.building_id,
                         status: data.status.value,
-                        image: data.image
+                        image1: data.image1,
+                        image2: data.image2,
+                        image3: data.image3
                     })).post(route('add_meeting_room'), {
                         forceFormData: true,
                         replace: true,
@@ -430,16 +478,34 @@ export default {
             mRoomForm.price_full_day = mRoom.value.price_full_day
             mRoomForm.status = mRoom.value.status
             mRoomForm.description = mRoom.value.description
-            mRoomForm.image = mRoom.value.image ? mRoom.value.image : mRoomForm.image
+            mRoomForm.image1 = mRoom.value.image1 ? mRoom.value.image1 : mRoomForm.image1
+            mRoomForm.image2 = mRoom.value.image2 ? mRoom.value.image2 : mRoomForm.image2
+            mRoomForm.image3 = mRoom.value.image3 ? mRoom.value.image3 : mRoomForm.image3
 
             // console.log(mRoomForm.building_id)
             // console.log(mRoomForm.status)
         };
 
-        const previewImage = (e) => {
+        // const previewImage = (url, e) => {
+        //     const file = e.target.files[0];
+        //     url.value = URL.createObjectURL(file);
+        //     console.log(url.value)
+        // };
+
+        const previewImage1 = (e) => {
             const file = e.target.files[0];
-            url.value = URL.createObjectURL(file);
-            console.log(url.value)
+            url1.value = URL.createObjectURL(file);
+            console.log(url1.value)
+        };
+        const previewImage2 = (e) => {
+            const file = e.target.files[0];
+            url2.value = URL.createObjectURL(file);
+            console.log(url2.value)
+        };
+        const previewImage3 = (e) => {
+            const file = e.target.files[0];
+            url3.value = URL.createObjectURL(file);
+            console.log(url3.value)
         };
 
         // const browseImg = () => {
@@ -459,13 +525,13 @@ export default {
         };
 
         return { 
-            dt, meetingRooms, meetingRoom, mRoomForm, url, 
+            dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, 
             filters, submitted,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
             meetingRoomDialog, statuses, 
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
             saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom,  //Method
-            addMroomDataToForm, previewImage,  //Method
+            addMroomDataToForm, previewImage1, previewImage2, previewImage3  //Method
         }
     }
 }

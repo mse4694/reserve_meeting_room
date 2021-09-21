@@ -53,7 +53,12 @@ class MeetingroomController extends Controller
         //      Request::input('price_half_day'),
         //      Request::input('price_full_day'),
         //      Request::input('description'),
-        //      Request::file('image'),
+        //      Request::input('image1'),
+        //      Request::file('image1'),
+        //      Request::input('image2'),
+        //      Request::file('image2'),
+        //      Request::input('image3'),
+        //      Request::file('image3'),
         // );
 
         $building_id = Request::input('building_id');
@@ -66,14 +71,35 @@ class MeetingroomController extends Controller
         $status = Request::input('status');
         $userin = '10039018';
         
-
         try {
-            $uuid = (string) Str::uuid();
-            $imgName = $uuid.".jpg";
-            $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
-            $img_file = ['img1'=> $imgName];
+            if( Request::hasFile('image1') ) {
+                $uuid = (string) Str::uuid();
+                $imgName1 = $uuid.".jpg";
+                $path1 = Request::file('image1')->storePubliclyAs('public/picture', $imgName1);
+            } else {
+                $imgName1 = Request::input('image1');
+            }
 
-            \Log::info($path);
+            if( Request::hasFile('image2') ) {
+                $uuid = (string) Str::uuid();
+                $imgName2 = $uuid.".jpg";
+                $path2 = Request::file('image2')->storePubliclyAs('public/picture', $imgName2);
+            } else {
+                $imgName2 = Request::input('image2');
+            }
+
+            if( Request::hasFile('image3') ) {
+                $uuid = (string) Str::uuid();
+                $imgName3 = $uuid.".jpg";
+                $path3 = Request::file('image3')->storePubliclyAs('public/picture', $imgName3);
+            } else {
+                $imgName3 = Request::input('image3');
+            }
+
+            //$path = $path1 ." | ". $path2 ." | ". $path3;
+            //\Log::info($path);
+
+            $img_file = ['img1'=> $imgName1, 'img2'=> $imgName2, 'img3'=> $imgName3];
 
             Meetingroom::create(['building_id'=>$building_id,'floor'=>$floor,
                                  'capacity'=>$capacity,'price'=>$price,
@@ -82,14 +108,8 @@ class MeetingroomController extends Controller
                                  'userin'=>$userin, 'img_file'=>$img_file 
                                 ]);
         } catch(\Exception  $e) {
-            \Log::info($e->message());
+            \Log::info($e->getMessage());
         }
-
-        // if(!$add_meeting_room){
-        //     $addStatus = "error";
-        //     $addDetail = "เพิ่มข้อมูลห้องประชุม ไม่สำเร็จ";
-        //     //\Log::info(Auth::user()->name.'!เพิ่มข้อมูลแพทย์ SAP-ID : ' . $siriraj_id . ' ชื่อ : ' . $preceptor_name .' ไม่สำเร็จ!');
-        // }
 
         return Redirect::route('manage_meeting_room');
     }
@@ -125,7 +145,9 @@ class MeetingroomController extends Controller
                     'price_full_day'=>(int)$mroom->price['full_day'],
                     'status'=>$mroom->status,
                     'description'=>$mroom->description['description'],
-                    'image'=>$mroom->img_file['img1'],
+                    'image1'=>$mroom->img_file['img1'],
+                    'image2'=>$mroom->img_file['img2'],
+                    'image3'=>$mroom->img_file['img3'],
                 ];
             }
         } else {
@@ -183,8 +205,8 @@ class MeetingroomController extends Controller
         //     Request::input('price_half_day'),
         //     Request::input('price_full_day'),
         //     Request::input('description'),
-        //     //Request::input('image'),
-        //     Request::input('oldimage'),
+        //     //Request::input('image1'),
+        //     Request::input('oldimage1'),
         // );
 
         \Log::info(Request::all());
@@ -200,52 +222,67 @@ class MeetingroomController extends Controller
         //$status = Request::input('status');
         $userin = '10039018';
         $user_last_act = '10039019';
-        $oldimage = Request::input('oldimage');
+        $oldimage1 = Request::input('oldimage1');
+        $oldimage2 = Request::input('oldimage2');
+        $oldimage3 = Request::input('oldimage3');
         //$img_file = ['img1'=> Request::input('image')];
 
         try {
-            // if( strcmp(Request::input('image'), "no_image.jpg") !== 0 ) {
-            //     if( strcmp($oldimage, "no_image.jpg") === 0 ) {
-            //         $uuid = (string) Str::uuid();
-            //         $imgName = $uuid.".jpg";
-            //         $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
-            //     } else {
-            //         $imgName = $oldimage;
-            //         $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
-            //     }
-            // } else {
-            //     $imgName = $oldimage;
-            // }
-
-            if( Request::hasFile('image') ) {
+            // รูปห้องที่ 1 
+            if( Request::hasFile('image1') ) {
                 $uuid = (string) Str::uuid();
-                $imgName = $uuid.".jpg";
-                if( strcmp($oldimage, "no_image.jpg") === 0 ) {
-                    $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+                $imgName1 = $uuid.".jpg";
+                if( strcmp($oldimage1, "no_image.jpg") === 0 ) {
+                    $path = Request::file('image1')->storePubliclyAs('public/picture', $imgName1);
                 } else {
-                    Storage::delete('public/picture/'.$oldimage);
-                    $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
+                    Storage::delete('public/picture/'.$oldimage1);
+                    $path = Request::file('image1')->storePubliclyAs('public/picture', $imgName1);
                 }
             } else {
-                if( strcmp($oldimage, "no_image.jpg") !== 0 ) {
-                    $imgName = $oldimage;
+                if( strcmp($oldimage1, "no_image.jpg") !== 0 ) {
+                    $imgName1 = $oldimage1;
                 } else {
-                    $imgName = Request::input('image');
+                    $imgName1 = Request::input('image1');
                 }
             }
 
+            // รูปห้องที่ 2 
+            if( Request::hasFile('image2') ) {
+                $uuid = (string) Str::uuid();
+                $imgName2 = $uuid.".jpg";
+                if( strcmp($oldimage2, "no_image.jpg") === 0 ) {
+                    $path = Request::file('image2')->storePubliclyAs('public/picture', $imgName2);
+                } else {
+                    Storage::delete('public/picture/'.$oldimage2);
+                    $path = Request::file('image2')->storePubliclyAs('public/picture', $imgName2);
+                }
+            } else {
+                if( strcmp($oldimage2, "no_image.jpg") !== 0 ) {
+                    $imgName2 = $oldimage2;
+                } else {
+                    $imgName2 = Request::input('image2');
+                }
+            }
 
-            // if( strcmp($oldimage, "no_image.jpg") === 0 ) {
-            //     if( strcmp(Request::input('image'), "no_image.jpg") !== 0 ) {
-            //         $uuid = (string) Str::uuid();
-            //         $imgName = $uuid.".jpg";
-            //         $path = Request::file('image')->storePubliclyAs('public/picture', $imgName);
-            //     }
-            // } else {
-            //     $imgName = $oldimage;
-            // }
+            // รูปห้องที่ 2 
+            if( Request::hasFile('image3') ) {
+                $uuid = (string) Str::uuid();
+                $imgName3 = $uuid.".jpg";
+                if( strcmp($oldimage3, "no_image.jpg") === 0 ) {
+                    $path = Request::file('image3')->storePubliclyAs('public/picture', $imgName3);
+                } else {
+                    Storage::delete('public/picture/'.$oldimage3);
+                    $path = Request::file('image3')->storePubliclyAs('public/picture', $imgName3);
+                }
+            } else {
+                if( strcmp($oldimage3, "no_image.jpg") !== 0 ) {
+                    $imgName3 = $oldimage3;
+                } else {
+                    $imgName3 = Request::input('image3');
+                }
+            }
             
-            $img_file = ['img1'=> $imgName];
+            $img_file = ['img1'=> $imgName1, 'img2'=> $imgName2, 'img3'=> $imgName3];
 
             Meetingroom::whereId((int)$id)
                         ->update([
@@ -256,7 +293,7 @@ class MeetingroomController extends Controller
                             'userin'=>$userin, 'user_last_act'=>$user_last_act, 'img_file'=>$img_file 
                         ]);
         } catch(\Exception  $e) {
-             \Log::info($e->message());
+             \Log::info($e->getMessage());
             // session([$updStatus => $updDetail]);
             //return back()->withInput()->with('menuType', 'editPreceptor');
             //return Redirect::back()->withErrors(['msg' => 'The Message']);
