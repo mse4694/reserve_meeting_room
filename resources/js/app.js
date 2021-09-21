@@ -49,6 +49,7 @@ import Fieldset from 'primevue/fieldset';
 import FileUpload from 'primevue/fileupload';
 import FullCalendar from 'primevue/fullcalendar';
 import Galleria from 'primevue/galleria';
+import Image from 'primevue/image';
 import InlineMessage from 'primevue/inlinemessage';
 import Inplace from 'primevue/inplace';
 import InputSwitch from 'primevue/inputswitch';
@@ -87,6 +88,7 @@ import SplitButton from 'primevue/splitbutton';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Steps from 'primevue/steps';
+import StyleClass from 'primevue/styleclass';
 import TabMenu from 'primevue/tabmenu';
 import TieredMenu from 'primevue/tieredmenu';
 import Textarea from 'primevue/textarea';
@@ -106,7 +108,9 @@ import TreeTable from 'primevue/treetable';
 import TriStateCheckbox from 'primevue/tristatecheckbox';
 import VirtualScroller from 'primevue/virtualscroller';
 
-import 'primevue/resources/themes/saga-blue/theme.css';   // theme
+import 'primevue/resources/themes/med/theme.css';   // theme
+//import 'primevue/resources/themes/tailwind-light/theme.css';   // theme
+//import 'primevue/resources/themes/saga-blue/theme.css';   // theme
 //import 'primevue/resources/themes/vela-blue/theme.css';   // theme
 //import 'primevue/resources/themes/nova/theme.css';          // theme
 
@@ -171,6 +175,7 @@ createInertiaApp({
     .directive('tooltip', Tooltip)
     .directive('badge', BadgeDirective)
     .directive('ripple', Ripple)
+    .directive('styleclass', StyleClass)
     .component('RouterLink', RouterLink)
     .component('Accordion', Accordion)
     .component('AccordionTab', AccordionTab)
@@ -205,6 +210,7 @@ createInertiaApp({
     .component('Fieldset', Fieldset)
     .component('FileUpload', FileUpload)
     .component('FullCalendar', FullCalendar)
+    .component('Image', Image)
     .component('InlineMessage', InlineMessage)
     .component('Inplace', Inplace)
     .component('InputMask', InputMask)
