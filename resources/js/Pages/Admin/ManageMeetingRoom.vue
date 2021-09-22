@@ -32,8 +32,8 @@
 
                     <Column header="รูปห้อง" >
                         <template #body="slotProps">
-                            <Image :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image1" class="meeting_room-image" preview />
-                            <!-- <img :src="`/storage/picture/${slotProps.data.image}`" :alt="slotProps.data.image" class="meeting_room-image" /> -->
+                            <!-- <Image :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" preview /> -->
+                            <img :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" @click="showGallery(slotProps.data)"/>
                         </template>
                     </Column>
 
@@ -81,12 +81,7 @@
                                     class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                                 />
                                 <img v-if="url1" :src="url1" class="w-30 mt-4 h-20"/>
-                                <div
-                                    v-if="errors.image1"
-                                    class="font-bold text-red-600"
-                                >
-                                    {{ errors.image1 }}
-                                </div>
+                                <div v-if="errors.image1" class="font-bold text-red-600">{{ errors.image1 }}</div>
                             </div>
                             <div>
                                 <input
@@ -97,12 +92,7 @@
                                     class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                                 />
                                 <img v-if="url2" :src="url2" class="w-30 mt-4 h-20"/>
-                                <div
-                                    v-if="errors.image2"
-                                    class="font-bold text-red-600"
-                                >
-                                    {{ errors.image2 }}
-                                </div>
+                                <div v-if="errors.image2" class="font-bold text-red-600">{{ errors.image2 }}</div>
                             </div>
                             <div>
                                 <input
@@ -113,12 +103,7 @@
                                     class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                                 />
                                 <img v-if="url3" :src="url3" class="w-30 mt-4 h-20"/>
-                                <div
-                                    v-if="errors.image3"
-                                    class="font-bold text-red-600"
-                                >
-                                    {{ errors.image3 }}
-                                </div>
+                                <div v-if="errors.image3" class="font-bold text-red-600">{{ errors.image3 }}</div>
                             </div>
                         </div>
                         <!-- <div class="mb-4 px-4">
@@ -253,6 +238,22 @@
                         <Button label="ใช่" icon="pi pi-check" class="p-button-raised p-button-text p-button-danger p-button-sm" @click="deleteMeetingRoom" />
                     </template>
                 </Dialog>
+
+                <Dialog v-model:visible="showGalleryDialog" :style="{width: '600px'}" :modal="true">
+                    <!-- <div class="flex items-center justify-center"> -->
+                        <Galleria :value="images" :showThumbnails="false" :showIndicators="true" :showItemNavigators="true">
+                            <template #item="slotProps">
+                                <img :src="slotProps.item.itemImageSrc"/>
+                            </template>
+                        </Galleria>
+                    <!-- </div> -->
+                </Dialog>
+
+                <!-- <Galleria v-model:visible="showGalleryDialog" :value="images">
+                            <template #item="slotProps">
+                                <img :src="slotProps.item.itemImageSrc"/>
+                            </template>
+                </Galleria> -->
             </div>
         </template>
     <!-- </div> -->
@@ -292,6 +293,7 @@ export default {
         });
         const deleteMeetingRoomDialog = ref(false);
         const deleteMeetingRoomsDialog = ref(false);
+        const showGalleryDialog = ref(false);
 
         const building = ref([
             {id: 1, building_id: 1, full_name: 'อัษฎางค์', short_name: 'อฎ.'},
@@ -324,6 +326,7 @@ export default {
         const url1 = ref(null);
         const url2 = ref(null);
         const url3 = ref(null);
+        const images = ref([]);
 
         const thaiStatus = (inputStatus) => {
             return statuses.value.find(status=>status.value === inputStatus)
@@ -364,8 +367,7 @@ export default {
             url1.value = `${base_url}/storage/picture/${mRoomForm.image1}`
             url2.value = `${base_url}/storage/picture/${mRoomForm.image2}`
             url3.value = `${base_url}/storage/picture/${mRoomForm.image3}`
-            //url.value = mRoomForm.image
-            console.log(url1.value)
+            //console.log(url1.value)
             meetingRoomDialog.value = true;
         };
 
@@ -464,8 +466,6 @@ export default {
         };
 
         const addMroomDataToForm = (mRoom) => {
-            //const tempRoom = {...mRoom}
-            //console.log(mRoom.value)
             mRoomForm.id = mRoom.value.id ? mRoom.value.id : null
             mRoomForm.fullname = mRoom.value.fullname
             mRoomForm.shortname = mRoom.value.shortname
@@ -481,9 +481,6 @@ export default {
             mRoomForm.image1 = mRoom.value.image1 ? mRoom.value.image1 : mRoomForm.image1
             mRoomForm.image2 = mRoom.value.image2 ? mRoom.value.image2 : mRoomForm.image2
             mRoomForm.image3 = mRoom.value.image3 ? mRoom.value.image3 : mRoomForm.image3
-
-            // console.log(mRoomForm.building_id)
-            // console.log(mRoomForm.status)
         };
 
         // const previewImage = (url, e) => {
@@ -495,17 +492,17 @@ export default {
         const previewImage1 = (e) => {
             const file = e.target.files[0];
             url1.value = URL.createObjectURL(file);
-            console.log(url1.value)
+            //console.log(url1.value)
         };
         const previewImage2 = (e) => {
             const file = e.target.files[0];
             url2.value = URL.createObjectURL(file);
-            console.log(url2.value)
+            //console.log(url2.value)
         };
         const previewImage3 = (e) => {
             const file = e.target.files[0];
             url3.value = URL.createObjectURL(file);
-            console.log(url3.value)
+            //console.log(url3.value)
         };
 
         // const browseImg = () => {
@@ -524,14 +521,29 @@ export default {
             return index;
         };
 
+        const showGallery = (mRoom) => {
+            images.value = []
+            const imagetmp = {...mRoom};
+            const image1 = `${base_url}/storage/picture/${imagetmp.image1}`
+            const image2 =  `${base_url}/storage/picture/${imagetmp.image2}`
+            const image3 =  `${base_url}/storage/picture/${imagetmp.image3}`
+            //console.log(imagetmp.image1)
+            images.value.push({"itemImageSrc": image1})
+            images.value.push({"itemImageSrc": image2})
+            images.value.push({"itemImageSrc": image3})
+
+            //console.log(images.value)
+            showGalleryDialog.value = true
+        }
+
         return { 
-            dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, 
+            dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, images, 
             filters, submitted,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
-            meetingRoomDialog, statuses, 
+            meetingRoomDialog, showGalleryDialog, statuses, 
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
             saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom,  //Method
-            addMroomDataToForm, previewImage1, previewImage2, previewImage3  //Method
+            addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery  //Method
         }
     }
 }

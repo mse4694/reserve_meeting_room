@@ -227,16 +227,24 @@ class MeetingroomController extends Controller
         $oldimage3 = Request::input('oldimage3');
         //$img_file = ['img1'=> Request::input('image')];
 
+        // $imageSet = array([
+        //               {'name' => 'image1', 'oldname' => $oldimage1},
+        //               {'name' => 'image2', 'oldname' => $oldimage2},
+        //               {'name' => 'image3', 'oldname' => $oldimage3}
+        // ]);
+
         try {
             // รูปห้องที่ 1 
             if( Request::hasFile('image1') ) {
                 $uuid = (string) Str::uuid();
-                $imgName1 = $uuid.".jpg";
+                $imgFile = Request::file('image1');
+                $imgExtension = strtolower($imgFile->getClientOriginalExtension());
+                $imgName1 = $uuid.".".$imgExtension;
                 if( strcmp($oldimage1, "no_image.jpg") === 0 ) {
-                    $path = Request::file('image1')->storePubliclyAs('public/picture', $imgName1);
+                    $path = $imgFile->storePubliclyAs('public/picture', $imgName1);
                 } else {
                     Storage::delete('public/picture/'.$oldimage1);
-                    $path = Request::file('image1')->storePubliclyAs('public/picture', $imgName1);
+                    $path = $imgFile->storePubliclyAs('public/picture', $imgName1);
                 }
             } else {
                 if( strcmp($oldimage1, "no_image.jpg") !== 0 ) {
@@ -249,12 +257,16 @@ class MeetingroomController extends Controller
             // รูปห้องที่ 2 
             if( Request::hasFile('image2') ) {
                 $uuid = (string) Str::uuid();
-                $imgName2 = $uuid.".jpg";
+                $imgFile = Request::file('image2');
+                $imgExtension = strtolower($imgFile->getClientOriginalExtension());
+                //$imgExtension = strtolower(Request::file('image2')->getClientOriginalExtension());
+                $imgName2 = $uuid.".".$imgExtension;
+                //$imgName2 = $uuid.".jpg";
                 if( strcmp($oldimage2, "no_image.jpg") === 0 ) {
-                    $path = Request::file('image2')->storePubliclyAs('public/picture', $imgName2);
+                    $path = $imgFile->storePubliclyAs('public/picture', $imgName2);
                 } else {
                     Storage::delete('public/picture/'.$oldimage2);
-                    $path = Request::file('image2')->storePubliclyAs('public/picture', $imgName2);
+                    $path = $imgFile->storePubliclyAs('public/picture', $imgName2);
                 }
             } else {
                 if( strcmp($oldimage2, "no_image.jpg") !== 0 ) {
@@ -267,12 +279,15 @@ class MeetingroomController extends Controller
             // รูปห้องที่ 2 
             if( Request::hasFile('image3') ) {
                 $uuid = (string) Str::uuid();
-                $imgName3 = $uuid.".jpg";
+                $imgFile = Request::file('image3');
+                $imgExtension = strtolower($imgFile->getClientOriginalExtension());
+                $imgName3 = $uuid.".".$imgExtension;
+                //$imgName3 = $uuid.".jpg";
                 if( strcmp($oldimage3, "no_image.jpg") === 0 ) {
-                    $path = Request::file('image3')->storePubliclyAs('public/picture', $imgName3);
+                    $path = $imgFile->storePubliclyAs('public/picture', $imgName3);
                 } else {
                     Storage::delete('public/picture/'.$oldimage3);
-                    $path = Request::file('image3')->storePubliclyAs('public/picture', $imgName3);
+                    $path = $imgFile->storePubliclyAs('public/picture', $imgName3);
                 }
             } else {
                 if( strcmp($oldimage3, "no_image.jpg") !== 0 ) {
@@ -293,12 +308,11 @@ class MeetingroomController extends Controller
                             'userin'=>$userin, 'user_last_act'=>$user_last_act, 'img_file'=>$img_file 
                         ]);
         } catch(\Exception  $e) {
-             \Log::info($e->getMessage());
+            //  \Log::info($e->getMessage());
             // session([$updStatus => $updDetail]);
             //return back()->withInput()->with('menuType', 'editPreceptor');
-            //return Redirect::back()->withErrors(['msg' => 'The Message']);
-            //\Log::info($e);
-            return Redirect::route('manage_meeting_room');
+            return Redirect::back()->withErrors(['msg' => $e->getMessage()]);
+            // return Redirect::route('manage_meeting_room');
         }
 
         return Redirect::route('manage_meeting_room');
@@ -313,5 +327,10 @@ class MeetingroomController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function storeImage() 
+    {
+
     }
 }
