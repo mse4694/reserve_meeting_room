@@ -72,28 +72,29 @@ class MeetingroomController extends Controller
         $userin = '10039018';
         
         try {
-            if( Request::hasFile('image1') ) {
+            if( Request::hasFile('image1') && !(is_null(Request::input('image1'))) ) {
                 $uuid = (string) Str::uuid();
                 $imgName1 = $uuid.".jpg";
                 $path1 = Request::file('image1')->storePubliclyAs('public/picture', $imgName1);
             } else {
-                $imgName1 = Request::input('image1');
+                $imgName1 = "no_image.jpg";
+                //$imgName1 = Request::input('image1');
             }
 
-            if( Request::hasFile('image2') ) {
+            if( Request::hasFile('image2') && !(is_null(Request::input('image2'))) ) {
                 $uuid = (string) Str::uuid();
                 $imgName2 = $uuid.".jpg";
                 $path2 = Request::file('image2')->storePubliclyAs('public/picture', $imgName2);
             } else {
-                $imgName2 = Request::input('image2');
+                $imgName2 = "no_image.jpg";
             }
 
-            if( Request::hasFile('image3') ) {
+            if( Request::hasFile('image3') && !(is_null(Request::input('image3'))) ) {
                 $uuid = (string) Str::uuid();
                 $imgName3 = $uuid.".jpg";
                 $path3 = Request::file('image3')->storePubliclyAs('public/picture', $imgName3);
             } else {
-                $imgName3 = Request::input('image3');
+                $imgName3 = "no_image.jpg";
             }
 
             //$path = $path1 ." | ". $path2 ." | ". $path3;
@@ -155,6 +156,37 @@ class MeetingroomController extends Controller
             $mrooms_tranform = [];
         }
         //\Log::info($mrooms_tranform);
+        return $mrooms_tranform;
+    }
+
+    public function showAllDelete()
+    {
+        $mrooms = Meetingroom::onlyTrashed()->get();
+        if(count($mrooms)) {
+            //\Log::info(count($mrooms));
+            foreach($mrooms as $mroom){
+                $mrooms_tranform[] = [
+                    'id'=>$mroom->id,
+                    'building_id'=>$mroom->building_id,
+                    'fullname'=>$mroom->fullname,
+                    'shortname'=>$mroom->shortname,
+                    'floor'=>$mroom->floor,
+                    'capacity_normal'=>(int)$mroom->capacity['normal'],
+                    'capacity_min'=>(int)$mroom->capacity['min'],
+                    'capacity_max'=>(int)$mroom->capacity['max'],
+                    'price_half_day'=>(int)$mroom->price['half_day'],
+                    'price_full_day'=>(int)$mroom->price['full_day'],
+                    'status'=>$mroom->status,
+                    'description'=>$mroom->description['description'],
+                    'image1'=>$mroom->img_file['img1'],
+                    'image2'=>$mroom->img_file['img2'],
+                    'image3'=>$mroom->img_file['img3'],
+                ];
+            }
+        } else {
+            //Not found delete meeting room
+            $mrooms_tranform = [];
+        }
         return $mrooms_tranform;
     }
 

@@ -9,8 +9,11 @@
             <div class="ml-4 mr-4">
                 <Toolbar>
                     <template #left>
-                        <div class="px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
-                        <div><Button label="ลบ" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div>
+                        <div class="mt-2 px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
+                        <div class="mt-2"><Button label="ลบ" icon="pi pi-trash" class="p-button-warning p-button-sm"  @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div>
+                    </template>
+                    <template #right>
+                        <div class="mt-2"><Button label="ลบห้องประชุมแบบถาวร" icon="pi pi-trash" class="p-button-danger p-button-sm" :badge="deletedMeetingRooms.length.toString()" badgeClass="p-badge-info" :disabled="!deletedMeetingRooms.length"/></div>
                     </template>
                 </Toolbar>
                 <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
@@ -240,20 +243,13 @@
                 </Dialog>
 
                 <Dialog v-model:visible="showGalleryDialog" :style="{width: '600px'}" :modal="true">
-                    <!-- <div class="flex items-center justify-center"> -->
-                        <Galleria :value="images" :showThumbnails="false" :showIndicators="true" :showItemNavigators="true">
-                            <template #item="slotProps">
-                                <img :src="slotProps.item.itemImageSrc"/>
-                            </template>
-                        </Galleria>
-                    <!-- </div> -->
+                    <Galleria :value="images" :showThumbnails="false" :showIndicators="true" :showItemNavigators="true">
+                        <template #item="slotProps">
+                            <img :src="slotProps.item.itemImageSrc"/>
+                        </template>
+                    </Galleria>
                 </Dialog>
 
-                <!-- <Galleria v-model:visible="showGalleryDialog" :value="images">
-                            <template #item="slotProps">
-                                <img :src="slotProps.item.itemImageSrc"/>
-                            </template>
-                </Galleria> -->
             </div>
         </template>
     <!-- </div> -->
@@ -278,12 +274,14 @@ export default {
     setup() {
         onMounted(() => {
             meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+            meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
         })
 
         const toast = useToast();
         const dt = ref();
         const meetingRoom = ref({});
         const meetingRooms = ref([]);
+        const deletedMeetingRooms = ref([]);
         const meetingRoomService = ref(new MeetingRoomService());
         const selectedMeetingRooms = ref();
         const meetingRoomDialog = ref(false);
@@ -298,6 +296,7 @@ export default {
         const building = ref([
             {id: 1, building_id: 1, full_name: 'อัษฎางค์', short_name: 'อฎ.'},
 	     	{id: 2, building_id: 2, full_name: 'นวมินทรบพิตรฯ', short_name: 'นว.'},
+            {id: 3, building_id: 3, full_name: 'ตึกธนาคารไทยพาณิชย์', short_name: 'ตึกไทยพาณิชย์'},
         ]);
 
         const statuses = ref([
@@ -491,18 +490,30 @@ export default {
 
         const previewImage1 = (e) => {
             const file = e.target.files[0];
-            url1.value = URL.createObjectURL(file);
-            //console.log(url1.value)
+            //console.log(file)
+            if( file ) {
+                url1.value = URL.createObjectURL(file);
+            } else {
+                url1.value = `${base_url}/storage/picture/no_image.jpg`
+            }
         };
         const previewImage2 = (e) => {
             const file = e.target.files[0];
-            url2.value = URL.createObjectURL(file);
-            //console.log(url2.value)
+            //url2.value = URL.createObjectURL(file);
+            if( file ) {
+                url2.value = URL.createObjectURL(file);
+            } else {
+                url2.value = `${base_url}/storage/picture/no_image.jpg`
+            }
         };
         const previewImage3 = (e) => {
             const file = e.target.files[0];
-            url3.value = URL.createObjectURL(file);
-            //console.log(url3.value)
+            //url3.value = URL.createObjectURL(file);
+            if( file ) {
+                url3.value = URL.createObjectURL(file);
+            } else {
+                url3.value = `${base_url}/storage/picture/no_image.jpg`
+            }
         };
 
         // const browseImg = () => {
@@ -538,7 +549,7 @@ export default {
 
         return { 
             dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, images, 
-            filters, submitted,
+            filters, submitted, deletedMeetingRooms,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
             meetingRoomDialog, showGalleryDialog, statuses, 
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
@@ -568,4 +579,5 @@ export default {
 .status-repair {
     background-color:lightpink;
 }
+
 </style>

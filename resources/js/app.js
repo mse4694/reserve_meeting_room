@@ -88,6 +88,7 @@ import SplitButton from 'primevue/splitbutton';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Steps from 'primevue/steps';
+import StyleClass from 'primevue/styleclass';
 import TabMenu from 'primevue/tabmenu';
 import TieredMenu from 'primevue/tieredmenu';
 import Textarea from 'primevue/textarea';
@@ -177,6 +178,7 @@ createInertiaApp({
     .directive('tooltip', Tooltip)
     .directive('badge', BadgeDirective)
     .directive('ripple', Ripple)
+    .directive('styleclass', StyleClass)
     .component('RouterLink', RouterLink)
     .component('Accordion', Accordion)
     .component('AccordionTab', AccordionTab)

@@ -13,7 +13,7 @@
             inkscape:export-ydpi="171"
             inkscape:version="0.91 r13725"
             width="120"
-            height="90">
+            height="81">
             <defs
               id="defs4">
               <filter
@@ -394,14 +394,16 @@
               <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>ห้องประชุม</div>
             </div>
           </Link>
+          <Link :href="route('manage_objective')">
+            <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
+              <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>วัตถุประสงค์การใช้ห้อง</div>
+            </div>
+          </Link>
           <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
             <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>สิทธิ์ผู้ใช้งาน</div>
           </div>
           <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
             <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>หน่วยงาน</div>
-          </div>
-          <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
-            <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>วัตถุประสงค์การใช้ห้อง</div>
           </div>
         </div>
 
