@@ -6,14 +6,14 @@
             <div class="text-xl border-double border-b-2 border-opacity-25 border-blue-500 mt-2 mb-4 ml-2">ข้อมูลห้องประชุม</div>
         </template> -->
         <template #content>
-            <div class="ml-4 mr-4">
+            <div v-if="!showDeletedMeetingRooms" class="ml-4 mr-4">
                 <Toolbar>
                     <template #left>
                         <div class="mt-2 px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
-                        <div class="mt-2"><Button label="ลบ" icon="pi pi-trash" class="p-button-warning p-button-sm"  @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div>
+                        <!-- <div class="mt-2"><Button label="ลบ" icon="pi pi-trash" class="p-button-warning p-button-sm"  @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div> -->
                     </template>
                     <template #right>
-                        <div class="mt-2"><Button label="ลบห้องประชุมแบบถาวร" icon="pi pi-trash" class="p-button-danger p-button-sm" :badge="deletedMeetingRooms.length.toString()" badgeClass="p-badge-info" :disabled="!deletedMeetingRooms.length"/></div>
+                        <div class="mt-2"><Button label="ลบห้องประชุมแบบถาวร" icon="pi pi-trash" class="p-button-danger p-button-sm" :badge="countDeletedMeetingRooms.length.toString()" badgeClass="p-badge-info" :disabled="!countDeletedMeetingRooms.length" @click="showDeletedMeetingRooms = true"/></div>
                     </template>
                 </Toolbar>
                 <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
@@ -31,7 +31,8 @@
                         </div>
                     </template>
 
-                    <Column selectionMode="multiple" :exportable="false" style="max-width:3rem"/>
+                    <!-- <Column selectionMode="multiple" :exportable="false" style="max-width:3rem"/> -->
+                    <!-- <Column selectionMode="single" :exportable="false" style="max-width:3rem"/> -->
 
                     <Column header="รูปห้อง" >
                         <template #body="slotProps">
@@ -72,10 +73,8 @@
                         <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
                         <!-- <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/> -->
                         <!-- <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" /> -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 space-x-2 mb-4">
-                            <div>
-                                <!-- <label for="File">เพิ่ม/แก้ไขภาพ</label> -->
-                                <!-- <i class="pi pi-camera"></i> -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 mb-4">
+                            <!-- <div>
                                 <input
                                     type="file"
                                     @input="mRoomForm.image1 = $event.target.files[0]"
@@ -85,28 +84,42 @@
                                 />
                                 <img v-if="url1" :src="url1" class="w-30 mt-4 h-20"/>
                                 <div v-if="errors.image1" class="font-bold text-red-600">{{ errors.image1 }}</div>
+                            </div> -->
+                            <div class="flex flex-col w-full mt-2 mb-4 px-2">
+                                <div class="w-full h-10 p-2 bg-grey-lighter">
+                                    <label class="flex flex-col items-center px-2 bg-white text-blue-400 rounded-lg shadow-lg tracking-wide uppercase border border-blue-400 cursor-pointer hover:bg-blue-400 hover:text-white">
+                                        <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                        </svg>
+                                        <span class="mt-2 text-base leading-normal">เลือกรูปที่ 1</span> 
+                                        <input type="file" @input="mRoomForm.image1 = $event.target.files[0]" @change="previewImage1" class="hidden">
+                                    </label>
+                                </div>
+                                <img v-if="url1" :src="url1" class="w-30 h-20 mt-8"/>
                             </div>
-                            <div>
-                                <input
-                                    type="file"
-                                    @input="mRoomForm.image2 = $event.target.files[0]"
-                                    @change="previewImage2"
-                                    ref="photo2"
-                                    class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-                                />
-                                <img v-if="url2" :src="url2" class="w-30 mt-4 h-20"/>
-                                <div v-if="errors.image2" class="font-bold text-red-600">{{ errors.image2 }}</div>
+                            <div class="flex flex-col w-full mt-2 mb-4 px-2">
+                                <div class="w-full h-10 p-2 bg-grey-lighter">
+                                    <label class="flex flex-col items-center px-2 bg-white text-blue-400 rounded-lg shadow-lg tracking-wide uppercase border border-blue-400 cursor-pointer hover:bg-blue-400 hover:text-white">
+                                        <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                        </svg>
+                                        <span class="mt-2 text-base leading-normal">เลือกรูปที่ 2</span> 
+                                        <input type="file" @input="mRoomForm.image2 = $event.target.files[0]" @change="previewImage2" class="hidden">
+                                    </label>
+                                </div>
+                                <img v-if="url2" :src="url2" class="w-30 h-20 mt-8"/>
                             </div>
-                            <div>
-                                <input
-                                    type="file"
-                                    @input="mRoomForm.image3 = $event.target.files[0]"
-                                    @change="previewImage3"
-                                    ref="photo3"
-                                    class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-                                />
-                                <img v-if="url3" :src="url3" class="w-30 mt-4 h-20"/>
-                                <div v-if="errors.image3" class="font-bold text-red-600">{{ errors.image3 }}</div>
+                            <div class="flex flex-col w-full mt-2 mb-4 px-2">
+                                <div class="w-full h-10 p-2 bg-grey-lighter">
+                                    <label class="flex flex-col items-center px-2 bg-white text-blue-400 rounded-lg shadow-lg tracking-wide uppercase border border-blue-400 cursor-pointer hover:bg-blue-400 hover:text-white">
+                                        <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                        </svg>
+                                        <span class="mt-2 text-base leading-normal">เลือกรูปที่ 3</span> 
+                                        <input type="file" @input="mRoomForm.image3 = $event.target.files[0]" @change="previewImage3" class="hidden">
+                                    </label>
+                                </div>
+                                <img v-if="url3" :src="url3" class="w-30 h-20 mt-8"/>
                             </div>
                         </div>
                         <!-- <div class="mb-4 px-4">
@@ -251,6 +264,59 @@
                 </Dialog>
 
             </div>
+
+            <div v-if="showDeletedMeetingRooms" class="ml-4 mr-4">
+                <Toolbar>
+                    <template #right>
+                        <div class="mt-2"><Button label="กลับไปจัดการห้องประชุม" icon="pi pi-trash" class="p-button-primary p-button-sm" @click="showDeletedMeetingRooms = false"/></div>
+                    </template>
+                </Toolbar>
+                <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
+                <DataTable ref="dt" :value="deletedMeetingRooms" dataKey="id" responsiveLayout="stack" breakpoint="960px"
+                    :paginator="true" :rows="10" :filters="filters" :scrollable="true" scrollHeight="flex" stripedRows class="p-datatable-sm"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
+                    currentPageReportTemplate="แสดง {first} ถึง {last} จากทั้งหมด {totalRecords}">
+                    <template #header>
+                        <div class="flex flex-col md:flex-row items-center justify-between">
+                            <h5 class="mb-2">จัดการลบห้องประชุมแบบถาวร</h5>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-search" />
+                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                            </span>
+                        </div>
+                    </template>
+
+                    <Column header="รูปห้อง" >
+                        <template #body="slotProps">
+                            <Image :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" preview />
+                            <!-- <img :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" @click="showGallery(slotProps.data)"/> -->
+                        </template>
+                    </Column>
+
+                    <Column field="fullname" header="ชื่อเต็ม" :sortable="true" />
+                    <Column field="shortname" header="ชื่อย่อ" :sortable="true"  />
+
+                    <Column field="building_id" header="สถานที่" :sortable="true" >
+                        <template #body="slotProps">
+                            <span>ตึก {{getBuildingName(slotProps.data.building_id).full_name}} ชั้น {{slotProps.data.floor}}</span>
+                        </template>
+                    </Column>
+
+                    <Column field="status" header="สถานะ" :sortable="true" >
+                        <template #body="slotProps">
+                            <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + (slotProps.data.status ? slotProps.data.status.toLowerCase() : '')">{{ thaiStatus(slotProps.data.status).label }}</span>
+                        </template>
+                    </Column>
+
+                    <Column :exportable="false" >
+                        <template #body="slotProps">
+                            <div class="mr-1"><Button icon="pi pi-undo" class="p-button-sm p-button-rounded p-button-primary" @click="restoreMeetingRoom(slotProps.data.id)"/></div>
+                            <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-danger" @click="slotProps.data"/></div>
+                        </template>
+                    </Column>
+                </DataTable>
+                <!-- </div> -->
+            </div>
         </template>
     <!-- </div> -->
     </Card>
@@ -260,7 +326,8 @@
 
 <script>
 import { ref, onMounted, computed, reactive } from 'vue';
-import { useForm } from '@inertiajs/inertia-vue3'
+import { Inertia } from '@inertiajs/inertia'
+import { useForm, usePage } from '@inertiajs/inertia-vue3'
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from "primevue/usetoast";
 
@@ -269,12 +336,20 @@ import MeetingRoomService from '@/Services/MeetingRoomService';
 export default {
     props: {
         errors: Object,
+        event: String,
     },
 
     setup() {
         onMounted(() => {
             meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
             meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+            
+            //const session_page = computed(() => usePage().props.value.event)
+
+            //console.log($page.props.event)
+            // if( session_page === 'manage_mroom' ) {
+            //     console.log('test')
+            // }
         })
 
         const toast = useToast();
@@ -282,6 +357,8 @@ export default {
         const meetingRoom = ref({});
         const meetingRooms = ref([]);
         const deletedMeetingRooms = ref([]);
+        //const numberDeletedMeetingRooms = ref(0);
+        const showDeletedMeetingRooms = ref(false);
         const meetingRoomService = ref(new MeetingRoomService());
         const selectedMeetingRooms = ref();
         const meetingRoomDialog = ref(false);
@@ -327,6 +404,8 @@ export default {
         const url3 = ref(null);
         const images = ref([]);
 
+        const countDeletedMeetingRooms = computed(() => { return deletedMeetingRooms.value })
+
         const thaiStatus = (inputStatus) => {
             return statuses.value.find(status=>status.value === inputStatus)
         };
@@ -353,10 +432,47 @@ export default {
 
         const deleteMeetingRoom = () => {
             // หาว่าห้องไหนไม่ใช่ห้องที่ลบ ก็จะนำมาแสดง ถ้าใช้กับ DB ก็สั่งลบตรงนี้ แล้วหา ห้องที่มีอยู่มาใหม่ แล้วใส่ตัวแปร ตามเดิม
-            meetingRooms.value = meetingRooms.value.filter(val => val.id !== meetingRoom.value.id); 
-            deleteMeetingRoomDialog.value = false;
-            meetingRoom.value = {};
-            toast.add({severity:'success', summary: 'Successful', detail: 'ห้องประชุมถูกลบเรียบร้อย', life: 3000});
+            //meetingRooms.value = meetingRooms.value.filter(val => val.id !== meetingRoom.value.id); 
+            Inertia.delete(`/mroom/${meetingRoom.value.id}/delete`, {
+                //onBefore: () => confirm('Are you sure you want to delete this user?'),
+                onSuccess: (page) => {
+                            //console.log(page)
+                            // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
+                            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                            meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+                            toast.add({severity:'success', summary: 'Successful', detail: 'นำห้องประชุมลงถังขยะเรียบร้อย', life: 3000});
+                        },
+                onError: (errors) => {
+                    console.log(errors)
+                },
+                onFinish: () => {
+                    deleteMeetingRoomDialog.value = false;
+                    meetingRoom.value = {};
+                    //mRoomForm.processing = false 
+                }
+            })
+            // deleteMeetingRoomDialog.value = false;
+            // meetingRoom.value = {};
+            //toast.add({severity:'success', summary: 'Successful', detail: 'ห้องประชุมถูกลบเรียบร้อย', life: 3000});
+        };
+
+        const restoreMeetingRoom = (mRoom) => {
+            //console.log(mRoom)
+            Inertia.get(`/mroom/${mRoom}/restore`, { preserveState: true }, {
+                onSuccess: (page) => {
+                    console.log(page)
+                    meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                    meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+                    toast.add({severity:'success', summary: 'Successful', detail: 'ยกเลิกการลบห้องประชุมเรียบร้อย', life: 3000});
+                },
+                onError: (errors) => {
+                    console.log(errors)
+                },
+                onFinish: () => {
+                    console.log('finish')
+                    showDeletedMeetingRooms.value = true
+                }
+            })
         };
 
         const editMeetingRoom = (mRoom) => {
@@ -549,12 +665,12 @@ export default {
 
         return { 
             dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, images, 
-            filters, submitted, deletedMeetingRooms,
+            filters, submitted, deletedMeetingRooms, showDeletedMeetingRooms,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
-            meetingRoomDialog, showGalleryDialog, statuses, 
+            meetingRoomDialog, showGalleryDialog, statuses,
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
-            saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom,  //Method
-            addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery  //Method
+            saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom, restoreMeetingRoom,  //Method
+            addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery, countDeletedMeetingRooms  //Method
         }
     }
 }

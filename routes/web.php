@@ -34,6 +34,8 @@ Route::get('/mroom/showall', [MeetingroomController::class, 'showall'])->name('s
 Route::get('/mroom/showall_delete', [MeetingroomController::class, 'showAllDelete'])->name('show_all_delete_meeting_room');
 Route::post('/mroom/add', [MeetingroomController::class, 'store'])->name('add_meeting_room');
 Route::post('/mroom/{id}/update', [MeetingroomController::class, 'update'])->name('update_meeting_room');
+Route::delete('/mroom/{id}/delete', [MeetingroomController::class, 'delete'])->name('delete_meeting_room_tempolary');
+Route::get('/mroom/{id}/restore', [MeetingroomController::class, 'restore'])->name('restore_meeting_room');
 
 //วัตถุประสงค์การใช้ห้องประชุม
 Route::get('/objective', [ObjectiveController::class, 'index'])->name('manage_objective');
