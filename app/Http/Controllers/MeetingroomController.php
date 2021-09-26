@@ -20,7 +20,7 @@ class MeetingroomController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/ManageMeetingRoom', ['event' => 'manage_mroom']);
+        return Inertia::render('Admin/ManageMeetingRoom');
     }
 
     /**
@@ -360,10 +360,14 @@ class MeetingroomController extends Controller
     public function restore($id)
     {
         //dd($id);
-        Meetingroom::withTrashed()->find((int)$id)->restore();
-        //return back();
-        //return Redirect::route('manage_meeting_room');
-        return Inertia::render('Admin/ManageMeetingRoom', ['event' => 'restore_mroom']);
+        $restore = Meetingroom::withTrashed()->find((int)$id)->restore();
+        //\Log::info($restore);
+        if($restore) {
+            return "success";
+        } else {
+            return "fail";
+        }
+        
     }
 
     /**

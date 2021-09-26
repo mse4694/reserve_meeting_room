@@ -9,4 +9,9 @@ export default class MeetingRoomService {
     getAllDeleteRoom() {
         return axios.get('/mroom/showall_delete').then(res => res.data);
     }
+
+    restoreRoom(id) {
+        return axios.post(`/mroom/${id}/restore`)
+            .then(res => res);
+    }
 }

@@ -362,6 +362,7 @@ export default {
         const meetingRoomService = ref(new MeetingRoomService());
         const selectedMeetingRooms = ref();
         const meetingRoomDialog = ref(false);
+        const restoreResult = ref()
         const submitted = ref(false);
         const filters = ref({
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -458,21 +459,32 @@ export default {
 
         const restoreMeetingRoom = (mRoom) => {
             //console.log(mRoom)
-            Inertia.get(`/mroom/${mRoom}/restore`, { preserveState: true }, {
-                onSuccess: (page) => {
-                    console.log(page)
-                    meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-                    meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+            meetingRoomService.value.restoreRoom(mRoom).then(function (res) {
+                //console.log(res)
+                if(res.data === 'success') {
                     toast.add({severity:'success', summary: 'Successful', detail: 'ยกเลิกการลบห้องประชุมเรียบร้อย', life: 3000});
-                },
-                onError: (errors) => {
-                    console.log(errors)
-                },
-                onFinish: () => {
-                    console.log('finish')
-                    showDeletedMeetingRooms.value = true
+                    meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+                    meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                } else {
+                    toast.add({severity:'error', summary: 'Failure', detail: 'ยกเลิกการลบห้องประชุมไม่สำเร็จ', life: 3000});
                 }
-            })
+            });
+
+            // Inertia.get(`/mroom/${mRoom}/restore`, { preserveState: true }, {
+            //     onSuccess: (page) => {
+            //         console.log(page)
+            //         meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+            //         meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+            //         toast.add({severity:'success', summary: 'Successful', detail: 'ยกเลิกการลบห้องประชุมเรียบร้อย', life: 3000});
+            //     },
+            //     onError: (errors) => {
+            //         console.log(errors)
+            //     },
+            //     onFinish: () => {
+            //         console.log('finish')
+            //         showDeletedMeetingRooms.value = true
+            //     }
+            // })
         };
 
         const editMeetingRoom = (mRoom) => {
@@ -667,7 +679,7 @@ export default {
             dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, images, 
             filters, submitted, deletedMeetingRooms, showDeletedMeetingRooms,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
-            meetingRoomDialog, showGalleryDialog, statuses,
+            meetingRoomDialog, showGalleryDialog, statuses, restoreResult,
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
             saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom, restoreMeetingRoom,  //Method
             addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery, countDeletedMeetingRooms  //Method
@@ -682,6 +694,10 @@ export default {
     width: 70px;
     height: 40px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.meeting_room-image:hover {
+    cursor:pointer; 
 }
 
 .status-ready {
