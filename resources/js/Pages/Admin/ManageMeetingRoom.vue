@@ -6,14 +6,16 @@
             <div class="text-xl border-double border-b-2 border-opacity-25 border-blue-500 mt-2 mb-4 ml-2">ข้อมูลห้องประชุม</div>
         </template> -->
         <template #content>
-            <div v-if="!showDeletedMeetingRooms" class="ml-4 mr-4">
+            <div class="ml-4 mr-4">
                 <Toolbar>
                     <template #left>
                         <div class="mt-2 px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
                         <!-- <div class="mt-2"><Button label="ลบ" icon="pi pi-trash" class="p-button-warning p-button-sm"  @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div> -->
                     </template>
                     <template #right>
-                        <div class="mt-2"><Button label="ลบห้องประชุมแบบถาวร" icon="pi pi-trash" class="p-button-danger p-button-sm" :badge="countDeletedMeetingRooms.length.toString()" badgeClass="p-badge-info" :disabled="!countDeletedMeetingRooms.length" @click="showDeletedMeetingRooms = true"/></div>
+                        <!-- <Link :href="route('recycle_bin_meeting_room')"> -->
+                        <div class="mt-2"><Button label="ลบห้องประชุมแบบถาวร" icon="pi pi-trash" class="p-button-danger p-button-sm" :badge="countDeletedMeetingRooms.toString()" badgeClass="p-badge-info" :disabled="countDeletedMeetingRooms === 0" @click="gotoRecycleBin"/></div>
+                        <!-- </Link> -->
                     </template>
                 </Toolbar>
                 <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
@@ -264,59 +266,6 @@
                 </Dialog>
 
             </div>
-
-            <div v-if="showDeletedMeetingRooms" class="ml-4 mr-4">
-                <Toolbar>
-                    <template #right>
-                        <div class="mt-2"><Button label="กลับไปจัดการห้องประชุม" icon="pi pi-trash" class="p-button-primary p-button-sm" @click="showDeletedMeetingRooms = false"/></div>
-                    </template>
-                </Toolbar>
-                <!-- <div class="mb-20" style="height: calc(100vh - 200px)"> -->
-                <DataTable ref="dt" :value="deletedMeetingRooms" dataKey="id" responsiveLayout="stack" breakpoint="960px"
-                    :paginator="true" :rows="10" :filters="filters" :scrollable="true" scrollHeight="flex" stripedRows class="p-datatable-sm"
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                    currentPageReportTemplate="แสดง {first} ถึง {last} จากทั้งหมด {totalRecords}">
-                    <template #header>
-                        <div class="flex flex-col md:flex-row items-center justify-between">
-                            <h5 class="mb-2">จัดการลบห้องประชุมแบบถาวร</h5>
-                            <span class="p-input-icon-left">
-                                <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" placeholder="Search..." />
-                            </span>
-                        </div>
-                    </template>
-
-                    <Column header="รูปห้อง" >
-                        <template #body="slotProps">
-                            <Image :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" preview />
-                            <!-- <img :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" @click="showGallery(slotProps.data)"/> -->
-                        </template>
-                    </Column>
-
-                    <Column field="fullname" header="ชื่อเต็ม" :sortable="true" />
-                    <Column field="shortname" header="ชื่อย่อ" :sortable="true"  />
-
-                    <Column field="building_id" header="สถานที่" :sortable="true" >
-                        <template #body="slotProps">
-                            <span>ตึก {{getBuildingName(slotProps.data.building_id).full_name}} ชั้น {{slotProps.data.floor}}</span>
-                        </template>
-                    </Column>
-
-                    <Column field="status" header="สถานะ" :sortable="true" >
-                        <template #body="slotProps">
-                            <span :class="'px-2 border-opacity-50 rounded-sm font-semibold status-' + (slotProps.data.status ? slotProps.data.status.toLowerCase() : '')">{{ thaiStatus(slotProps.data.status).label }}</span>
-                        </template>
-                    </Column>
-
-                    <Column :exportable="false" >
-                        <template #body="slotProps">
-                            <div class="mr-1"><Button icon="pi pi-undo" class="p-button-sm p-button-rounded p-button-primary" @click="restoreMeetingRoom(slotProps.data.id)"/></div>
-                            <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-danger" @click="slotProps.data"/></div>
-                        </template>
-                    </Column>
-                </DataTable>
-                <!-- </div> -->
-            </div>
         </template>
     <!-- </div> -->
     </Card>
@@ -325,9 +274,9 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, reactive } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Inertia } from '@inertiajs/inertia'
-import { useForm, usePage } from '@inertiajs/inertia-vue3'
+import { useForm, usePage, Link } from '@inertiajs/inertia-vue3'
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from "primevue/usetoast";
 
@@ -336,20 +285,22 @@ import MeetingRoomService from '@/Services/MeetingRoomService';
 export default {
     props: {
         errors: Object,
-        event: String,
+        mrooms_tranform: Array,
+        dmrooms: Number,
+    },
+
+    components: {
+        Link,
     },
 
     setup() {
         onMounted(() => {
-            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-            meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+            //meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+            //meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
             
-            //const session_page = computed(() => usePage().props.value.event)
-
-            //console.log($page.props.event)
-            // if( session_page === 'manage_mroom' ) {
-            //     console.log('test')
-            // }
+            //console.log(usePage().props.value.mrooms_tranform);
+            meetingRooms.value = usePage().props.value.mrooms_tranform
+            deletedMeetingRooms.value = usePage().props.value.dmrooms
         })
 
         const toast = useToast();
@@ -357,12 +308,10 @@ export default {
         const meetingRoom = ref({});
         const meetingRooms = ref([]);
         const deletedMeetingRooms = ref([]);
-        //const numberDeletedMeetingRooms = ref(0);
         const showDeletedMeetingRooms = ref(false);
         const meetingRoomService = ref(new MeetingRoomService());
         const selectedMeetingRooms = ref();
         const meetingRoomDialog = ref(false);
-        const restoreResult = ref()
         const submitted = ref(false);
         const filters = ref({
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -415,6 +364,10 @@ export default {
             return building.value.find(bname=>bname.building_id === input_building_id)
         };
 
+        const gotoRecycleBin = () => {
+            Inertia.get( route('recycle_bin_meeting_room') )
+        }
+
         const confirmDeleteSelected = () => {
             deleteMeetingRoomsDialog.value = true;
         };
@@ -439,8 +392,10 @@ export default {
                 onSuccess: (page) => {
                             //console.log(page)
                             // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
-                            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-                            meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+                            //meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                            //meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
+                            meetingRooms.value = usePage().props.value.mrooms_tranform
+                            deletedMeetingRooms.value = usePage().props.value.dmrooms
                             toast.add({severity:'success', summary: 'Successful', detail: 'นำห้องประชุมลงถังขยะเรียบร้อย', life: 3000});
                         },
                 onError: (errors) => {
@@ -452,39 +407,6 @@ export default {
                     //mRoomForm.processing = false 
                 }
             })
-            // deleteMeetingRoomDialog.value = false;
-            // meetingRoom.value = {};
-            //toast.add({severity:'success', summary: 'Successful', detail: 'ห้องประชุมถูกลบเรียบร้อย', life: 3000});
-        };
-
-        const restoreMeetingRoom = (mRoom) => {
-            //console.log(mRoom)
-            meetingRoomService.value.restoreRoom(mRoom).then(function (res) {
-                //console.log(res)
-                if(res.data === 'success') {
-                    toast.add({severity:'success', summary: 'Successful', detail: 'ยกเลิกการลบห้องประชุมเรียบร้อย', life: 3000});
-                    meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
-                    meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-                } else {
-                    toast.add({severity:'error', summary: 'Failure', detail: 'ยกเลิกการลบห้องประชุมไม่สำเร็จ', life: 3000});
-                }
-            });
-
-            // Inertia.get(`/mroom/${mRoom}/restore`, { preserveState: true }, {
-            //     onSuccess: (page) => {
-            //         console.log(page)
-            //         meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-            //         meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
-            //         toast.add({severity:'success', summary: 'Successful', detail: 'ยกเลิกการลบห้องประชุมเรียบร้อย', life: 3000});
-            //     },
-            //     onError: (errors) => {
-            //         console.log(errors)
-            //     },
-            //     onFinish: () => {
-            //         console.log('finish')
-            //         showDeletedMeetingRooms.value = true
-            //     }
-            // })
         };
 
         const editMeetingRoom = (mRoom) => {
@@ -543,7 +465,8 @@ export default {
                         onSuccess: (page) => {
                             //console.log(page)
                             // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
-                            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                            meetingRooms.value = usePage().props.value.mrooms_tranform
+                            deletedMeetingRooms.value = usePage().props.value.dmrooms
                             toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
                         },
                         onError: (errors) => {
@@ -553,8 +476,6 @@ export default {
                             mRoomForm.processing = false 
                         }
                     });
-                    // toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
-                    // mRoomForm.reset()
                 } else {
                     console.log("Add New Data");
                     // ส่งข้อมูลไปที่ controller โดยใช้ form Helper
@@ -573,7 +494,8 @@ export default {
                         onSuccess: (page) => {
                             //console.log(page)
                             // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
-                            meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
+                            meetingRooms.value = usePage().props.value.mrooms_tranform
+                            deletedMeetingRooms.value = usePage().props.value.dmrooms
                             toast.add({severity:'success', summary: 'Successful', detail: 'เพิ่มข้อมูลห้องประชุมใหม่เรียบร้อย', life: 3000}); 
                         },
                         onError: (errors) => {
@@ -610,12 +532,6 @@ export default {
             mRoomForm.image3 = mRoom.value.image3 ? mRoom.value.image3 : mRoomForm.image3
         };
 
-        // const previewImage = (url, e) => {
-        //     const file = e.target.files[0];
-        //     url.value = URL.createObjectURL(file);
-        //     console.log(url.value)
-        // };
-
         const previewImage1 = (e) => {
             const file = e.target.files[0];
             //console.log(file)
@@ -627,7 +543,6 @@ export default {
         };
         const previewImage2 = (e) => {
             const file = e.target.files[0];
-            //url2.value = URL.createObjectURL(file);
             if( file ) {
                 url2.value = URL.createObjectURL(file);
             } else {
@@ -636,17 +551,12 @@ export default {
         };
         const previewImage3 = (e) => {
             const file = e.target.files[0];
-            //url3.value = URL.createObjectURL(file);
             if( file ) {
                 url3.value = URL.createObjectURL(file);
             } else {
                 url3.value = `${base_url}/storage/picture/no_image.jpg`
             }
         };
-
-        // const browseImg = () => {
-        //     this.$refs.photo.click();
-        // };
 
         const findIndexById = (id) => {
             let index = -1;
@@ -679,9 +589,9 @@ export default {
             dt, meetingRooms, meetingRoom, mRoomForm, url1, url2, url3, images, 
             filters, submitted, deletedMeetingRooms, showDeletedMeetingRooms,
             deleteMeetingRoomsDialog, deleteMeetingRoomDialog, building, selectedMeetingRooms,
-            meetingRoomDialog, showGalleryDialog, statuses, restoreResult,
+            meetingRoomDialog, showGalleryDialog, statuses,
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
-            saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom, restoreMeetingRoom,  //Method
+            saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom, gotoRecycleBin, //Method
             addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery, countDeletedMeetingRooms  //Method
         }
     }

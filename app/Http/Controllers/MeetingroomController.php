@@ -20,7 +20,45 @@ class MeetingroomController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/ManageMeetingRoom');
+        $mrooms = Meetingroom::all();
+        if(count($mrooms)) {
+            //\Log::info(count($mrooms));
+            foreach($mrooms as $mroom){
+                $mrooms_tranform[] = [
+                    'id'=>$mroom->id,
+                    'building_id'=>$mroom->building_id,
+                    'fullname'=>$mroom->fullname,
+                    'shortname'=>$mroom->shortname,
+                    'floor'=>$mroom->floor,
+                    'capacity_normal'=>(int)$mroom->capacity['normal'],
+                    'capacity_min'=>(int)$mroom->capacity['min'],
+                    'capacity_max'=>(int)$mroom->capacity['max'],
+                    'price_half_day'=>(int)$mroom->price['half_day'],
+                    'price_full_day'=>(int)$mroom->price['full_day'],
+                    'status'=>$mroom->status,
+                    'description'=>$mroom->description['description'],
+                    'image1'=>$mroom->img_file['img1'],
+                    'image2'=>$mroom->img_file['img2'],
+                    'image3'=>$mroom->img_file['img3'],
+                ];
+            }
+        } else {
+            $mrooms_tranform = [];     //Not found meeting room
+        }
+
+        $dmrooms = Meetingroom::onlyTrashed()->get();
+        if(count($dmrooms)) {
+            $count_drooms = count($dmrooms);
+        } else {
+            $count_drooms = 0;    //Not found delete meeting room
+        }
+
+        return Inertia::render('Admin/ManageMeetingRoom', 
+                                    [
+                                        'mrooms_tranform' => $mrooms_tranform, 
+                                        'dmrooms' => $count_drooms
+                                    ]
+                              );
     }
 
     /**
@@ -124,70 +162,6 @@ class MeetingroomController extends Controller
     public function show($id)
     {
         //
-    }
-
-    public function showall()
-    {
-        //dd( Meetingroom::all());
-        $mrooms = Meetingroom::all();
-        if(count($mrooms)) {
-            //\Log::info(count($mrooms));
-            foreach($mrooms as $mroom){
-                $mrooms_tranform[] = [
-                    'id'=>$mroom->id,
-                    'building_id'=>$mroom->building_id,
-                    'fullname'=>$mroom->fullname,
-                    'shortname'=>$mroom->shortname,
-                    'floor'=>$mroom->floor,
-                    'capacity_normal'=>(int)$mroom->capacity['normal'],
-                    'capacity_min'=>(int)$mroom->capacity['min'],
-                    'capacity_max'=>(int)$mroom->capacity['max'],
-                    'price_half_day'=>(int)$mroom->price['half_day'],
-                    'price_full_day'=>(int)$mroom->price['full_day'],
-                    'status'=>$mroom->status,
-                    'description'=>$mroom->description['description'],
-                    'image1'=>$mroom->img_file['img1'],
-                    'image2'=>$mroom->img_file['img2'],
-                    'image3'=>$mroom->img_file['img3'],
-                ];
-            }
-        } else {
-            //\Log::info("No room");
-            $mrooms_tranform = [];
-        }
-        //\Log::info($mrooms_tranform);
-        return $mrooms_tranform;
-    }
-
-    public function showAllDelete()
-    {
-        $mrooms = Meetingroom::onlyTrashed()->get();
-        if(count($mrooms)) {
-            //\Log::info(count($mrooms));
-            foreach($mrooms as $mroom){
-                $mrooms_tranform[] = [
-                    'id'=>$mroom->id,
-                    'building_id'=>$mroom->building_id,
-                    'fullname'=>$mroom->fullname,
-                    'shortname'=>$mroom->shortname,
-                    'floor'=>$mroom->floor,
-                    'capacity_normal'=>(int)$mroom->capacity['normal'],
-                    'capacity_min'=>(int)$mroom->capacity['min'],
-                    'capacity_max'=>(int)$mroom->capacity['max'],
-                    'price_half_day'=>(int)$mroom->price['half_day'],
-                    'price_full_day'=>(int)$mroom->price['full_day'],
-                    'status'=>$mroom->status,
-                    'description'=>$mroom->description['description'],
-                    'image1'=>$mroom->img_file['img1'],
-                    'image2'=>$mroom->img_file['img2'],
-                    'image3'=>$mroom->img_file['img3'],
-                ];
-            }
-        } else {
-            //Not found delete meeting room
-            $mrooms_tranform = [];
-        }
-        return $mrooms_tranform;
     }
 
     /**
@@ -350,26 +324,6 @@ class MeetingroomController extends Controller
         return Redirect::route('manage_meeting_room');
     }
 
-    public function delete($id)
-    {
-        //dd($id);
-        Meetingroom::whereId((int)$id)->delete();
-        return Redirect::route('manage_meeting_room');
-    }
-
-    public function restore($id)
-    {
-        //dd($id);
-        $restore = Meetingroom::withTrashed()->find((int)$id)->restore();
-        //\Log::info($restore);
-        if($restore) {
-            return "success";
-        } else {
-            return "fail";
-        }
-        
-    }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -378,11 +332,8 @@ class MeetingroomController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Meetingroom::whereId((int)$id)->delete();
+        return Redirect::route('manage_meeting_room');
     }
 
-    public function storeImage() 
-    {
-
-    }
 }

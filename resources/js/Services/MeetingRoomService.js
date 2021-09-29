@@ -11,7 +11,7 @@ export default class MeetingRoomService {
     }
 
     restoreRoom(id) {
-        return axios.post(`/mroom/${id}/restore`)
+        return axios.patch(`/mroom/${id}/restore`)
             .then(res => res);
     }
 }
