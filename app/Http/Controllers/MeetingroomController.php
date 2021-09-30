@@ -148,6 +148,7 @@ class MeetingroomController extends Controller
                                 ]);
         } catch(\Exception  $e) {
             \Log::info($e->getMessage());
+            return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
         }
 
         return Redirect::route('manage_meeting_room');
@@ -215,7 +216,7 @@ class MeetingroomController extends Controller
         //     Request::input('oldimage1'),
         // );
 
-        \Log::info(Request::all());
+        //\Log::info(Request::all());
 
         //$building_id = Request::input('building_id');
         $floor = Request::input('floor');
@@ -315,10 +316,7 @@ class MeetingroomController extends Controller
                         ]);
         } catch(\Exception  $e) {
             //  \Log::info($e->getMessage());
-            // session([$updStatus => $updDetail]);
-            //return back()->withInput()->with('menuType', 'editPreceptor');
-            return Redirect::back()->withErrors(['msg' => $e->getMessage()]);
-            // return Redirect::route('manage_meeting_room');
+            return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
         }
 
         return Redirect::route('manage_meeting_room');
@@ -332,7 +330,13 @@ class MeetingroomController extends Controller
      */
     public function destroy($id)
     {
-        Meetingroom::whereId((int)$id)->delete();
+        try {
+            Meetingroom::whereId((int)$id)->delete();
+        } catch(\Exception  $e) { 
+            \Log::info($e->getMessage());
+            return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
+        }
+
         return Redirect::route('manage_meeting_room');
     }
 

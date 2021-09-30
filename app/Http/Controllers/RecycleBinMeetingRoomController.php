@@ -66,13 +66,13 @@ class RecycleBinMeetingRoomController extends Controller
     public function store($id)
     {
         //return Redirect::back()->withErrors(['msg' => 'fail']);
-        $restore = Meetingroom::withTrashed()->find((int)$id)->restore();
-        //\Log::info($restore);
-        if($restore) {
-            return Redirect::route('recycle_bin_meeting_room');
-        } else {
-            return Redirect::back()->withErrors(['msg' => 'fail']);
-        }   
+        try {
+            Meetingroom::withTrashed()->find((int)$id)->restore();
+        } catch(\Exception  $e) {
+            return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
+        }
+
+        return Redirect::route('recycle_bin_meeting_room');
     }
 
     /**
@@ -117,6 +117,16 @@ class RecycleBinMeetingRoomController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //\Log::info($id);
+        //return Redirect::route('recycle_bin_meeting_room');
+        //return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => 'system error message']);
+        try {
+            Meetingroom::whereId((int)$id)->forceDelete();
+        } catch(\Exception  $e) { 
+            \Log::info($e->getMessage());
+            return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
+        }
+
+        return Redirect::route('recycle_bin_meeting_room');
     }
 }

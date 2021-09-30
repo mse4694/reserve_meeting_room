@@ -72,9 +72,6 @@
                 <!-- <Dialog v-model:visible="meetingRoomDialog" :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '450px'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid"> -->
                 <Dialog v-model:visible="meetingRoomDialog" :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '50vw'}" header="ข้อมูลห้องประชุม" :modal="true" class="p-fluid">
                     <div class="mt-4 mb-4">
-                        <!-- <img src="/storage/picture/no_image.jpg" class="meetingRoom-image"/> -->
-                        <!-- <img src="/storage/picture/no_image.jpg" :alt="mRoomForm.image" class="meetingRoom-image" v-if="mRoomForm.image"/> -->
-                        <!-- <Button label="เพิ่ม/แก้ไขภาพ" icon="pi pi-plus" class="p-button-success p-button-sm" /> -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 mb-4">
                             <!-- <div>
                                 <input
@@ -124,15 +121,6 @@
                                 <img v-if="url3" :src="url3" class="w-30 h-20 mt-8"/>
                             </div>
                         </div>
-                        <!-- <div class="mb-4 px-4">
-                            <input type="file" accept="image/*.jpg" @input="mRoomForm.image = $event.target.files[0]" ref="photo" class="hidden" @change="previewImage">
-                            <div class="relative inline-block">
-                                <img v-if="url" :src="url" :alt="mRoomForm.image" class="w-full rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 object-cover">
-                                <div class="absolute top-0 w-full h-full flex items-center justify-center">
-                                    <button @click="browseImg" class="rounded-full hover:bg-white hover:bg-opacity-25 p-2 focus:outline-none"><i class="pi pi-camera"></i></button>
-                                </div>
-                            </div>
-                        </div> -->
                     </div>
                     <div class="mb-4">
                         <label for="room_full_name">ชื่อเต็มห้องประชุม</label>
@@ -249,7 +237,7 @@
                 <Dialog v-model:visible="deleteMeetingRoomDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                     <div class="confirmation-content">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: #e65c00" />
-                        <span v-if="meetingRoom">คุณต้องการลบห้องประชุม <b>{{meetingRoom.fullname}}</b>?</span>
+                        <span v-if="meetingRoom">คุณต้องการลบห้องประชุม <b>{{meetingRoom.fullname}}</b> แบบชั่วคราว ?</span>
                     </div>
                     <template #footer>
                         <Button label="ไม่ใช่" icon="pi pi-times" class="p-button-sm" @click="deleteMeetingRoomDialog = false"/>
@@ -257,6 +245,7 @@
                     </template>
                 </Dialog>
 
+                <!-- สำหรับแสดงรูปห้องประชุม -->
                 <Dialog v-model:visible="showGalleryDialog" :style="{width: '600px'}" :modal="true">
                     <Galleria :value="images" :showThumbnails="false" :showIndicators="true" :showItemNavigators="true">
                         <template #item="slotProps">
@@ -323,7 +312,7 @@ export default {
         const building = ref([
             {id: 1, building_id: 1, full_name: 'อัษฎางค์', short_name: 'อฎ.'},
 	     	{id: 2, building_id: 2, full_name: 'นวมินทรบพิตรฯ', short_name: 'นว.'},
-            {id: 3, building_id: 3, full_name: 'ตึกธนาคารไทยพาณิชย์', short_name: 'ตึกไทยพาณิชย์'},
+            {id: 3, building_id: 3, full_name: 'ธนาคารไทยพาณิชย์', short_name: 'ตึกไทยพาณิชย์'},
         ]);
 
         const statuses = ref([
@@ -349,6 +338,7 @@ export default {
             image2: 'no_image.jpg',
             image3: 'no_image.jpg'
         });
+
         const url1 = ref(null);
         const url2 = ref(null);
         const url3 = ref(null);
@@ -387,24 +377,20 @@ export default {
         const deleteMeetingRoom = () => {
             // หาว่าห้องไหนไม่ใช่ห้องที่ลบ ก็จะนำมาแสดง ถ้าใช้กับ DB ก็สั่งลบตรงนี้ แล้วหา ห้องที่มีอยู่มาใหม่ แล้วใส่ตัวแปร ตามเดิม
             //meetingRooms.value = meetingRooms.value.filter(val => val.id !== meetingRoom.value.id); 
-            Inertia.delete(`/mroom/${meetingRoom.value.id}/delete`, {
+            Inertia.delete(route('delete_meeting_room_tempolary', meetingRoom.value.id), {
                 //onBefore: () => confirm('Are you sure you want to delete this user?'),
-                onSuccess: (page) => {
-                            //console.log(page)
-                            // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
-                            //meetingRoomService.value.getAllRoom().then(data => meetingRooms.value = data);
-                            //meetingRoomService.value.getAllDeleteRoom().then(data => deletedMeetingRooms.value = data);
-                            meetingRooms.value = usePage().props.value.mrooms_tranform
-                            deletedMeetingRooms.value = usePage().props.value.dmrooms
-                            toast.add({severity:'success', summary: 'Successful', detail: 'นำห้องประชุมลงถังขยะเรียบร้อย', life: 3000});
-                        },
+                onSuccess: () => {
+                    // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
+                    meetingRooms.value = usePage().props.value.mrooms_tranform
+                    deletedMeetingRooms.value = usePage().props.value.dmrooms
+                    toast.add({severity:'success', summary: 'Successful', detail: 'ลบห้องประชุมแบบชั่วคราวเรียบร้อย', life: 3000});
+                },
                 onError: (errors) => {
                     console.log(errors)
                 },
                 onFinish: () => {
                     deleteMeetingRoomDialog.value = false;
                     meetingRoom.value = {};
-                    //mRoomForm.processing = false 
                 }
             })
         };
@@ -438,15 +424,22 @@ export default {
             submitted.value = false;
         };
 
+        const checkRequireData = () => {
+            if( mRoomForm.fullname && mRoomForm.shortname && mRoomForm.building_id && mRoomForm.floor && mRoomForm.status 
+                && mRoomForm.capacity_normal && mRoomForm.capacity_min && mRoomForm.capacity_max 
+                && mRoomForm.price_half_day && mRoomForm.price_full_day) 
+            {
+                return true
+            } else {
+                return false
+            }
+        };
+
         const saveMeetingRoom = () => {
             submitted.value = true;
-            //console.log(meetingRoom.value)
-            // ใช้ตรวจสอบตัวแปร ว่ามีข้อมูลกรอกเข้ามาหรือไม่ ซึ่งถ้าไม่มีข้อมูล จะขึ้นเป็น undefine
-            // if(!(meetingRoom.value.room_full_name && meetingRoom.value.room_short_name 
-            //     && meetingRoom.value.building_id && meetingRoom.value.room_size && meetingRoom.value.status
-            //    )) {
-            if(! mRoomForm.fullname ) {
-                console.log('meetingRoom Object is missing some value');
+            if(! checkRequireData() ) {
+                console.log('ยังระบุรายละเอียดห้องประชุมไม่ครบถ้วน');
+                toast.add({severity:'warn', summary: 'Warning', detail: 'ยังระบุรายละเอียดห้องประชุมไม่ครบถ้วน', life: 3000});
             } else {
                 if(mRoomForm.id) {
                     console.log("Edit Data");
@@ -456,13 +449,11 @@ export default {
                         oldimage1: meetingRoom.value.image1,
                         oldimage2: meetingRoom.value.image2,
                         oldimage3: meetingRoom.value.image3
-                        // building_id: data.building_id.building_id,
-                        // status: data.status.value
                     })).post(`/mroom/${mRoomForm.id}/update`, {
                         // replace: true,
                         // onBefore: () => {
                         // },
-                        onSuccess: (page) => {
+                        onSuccess: () => {
                             //console.log(page)
                             // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
                             meetingRooms.value = usePage().props.value.mrooms_tranform
@@ -506,7 +497,6 @@ export default {
                         }
                     });
                 }
-                //console.log(mRoomForm.image)
                 mRoomForm.reset()
                 submitted.value = false;
                 meetingRoomDialog.value = false;
@@ -592,7 +582,7 @@ export default {
             meetingRoomDialog, showGalleryDialog, statuses,
             openNew, hideDialog, confirmDeleteSelected, deleteSelectedMeetingRooms, confirmDeleteMeetingRoom,    //Method
             saveMeetingRoom, editMeetingRoom, thaiStatus, getBuildingName, findIndexById, deleteMeetingRoom, gotoRecycleBin, //Method
-            addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery, countDeletedMeetingRooms  //Method
+            addMroomDataToForm, previewImage1, previewImage2, previewImage3, showGallery, countDeletedMeetingRooms, checkRequireData  //Method
         }
     }
 }

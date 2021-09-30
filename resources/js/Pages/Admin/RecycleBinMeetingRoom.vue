@@ -51,14 +51,28 @@
                         <Column :exportable="false" >
                             <template #body="slotProps">
                                 <div class="mr-1"><Button icon="pi pi-undo" class="p-button-sm p-button-rounded p-button-primary" @click="restoreMeetingRoom(slotProps.data.id)"/></div>
-                                <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-danger" @click="slotProps.data"/></div>
+                                <div><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-danger" @click="confirmDeleteMeetingRoom(slotProps.data)"/></div>
                             </template>
                         </Column>
                     </DataTable>
                 </div>
+
+                <!-- สำหรับลบห้องประชุมจากปุ่มลบของ Row ตัวเอง-->
+                <Dialog v-model:visible="permananceDeleteMeetingRoomDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+                    <div class="confirmation-content">
+                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: #e65c00" />
+                        <span v-if="meetingRoom">คุณต้องการลบห้องประชุม <b>{{meetingRoom.fullname}}</b> แบบถาวร ?</span>
+                    </div>
+                    <template #footer>
+                        <Button label="ไม่ใช่" icon="pi pi-times" class="p-button-sm" @click="permananceDeleteMeetingRoomDialog = false"/>
+                        <Button label="ใช่" icon="pi pi-check" class="p-button-raised p-button-text p-button-danger p-button-sm" @click="permananceDeleteMeetingRoom" />
+                    </template>
+                </Dialog>
+
             </template>
         </Card>
         <Toast position="top-right" />
+        <Toast position="center" group="errorkey" />
     </AppLayout>
 </template>
 
@@ -86,8 +100,9 @@ export default {
 
         const toast = useToast();
         const dt = ref();
+        const meetingRoom = ref({});
         const deletedMeetingRooms = ref([]);
-        const submitted = ref(false);
+        const permananceDeleteMeetingRoomDialog = ref(false);
         const filters = ref({
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         });
@@ -95,7 +110,7 @@ export default {
         const building = ref([
             {id: 1, building_id: 1, full_name: 'อัษฎางค์', short_name: 'อฎ.'},
 	     	{id: 2, building_id: 2, full_name: 'นวมินทรบพิตรฯ', short_name: 'นว.'},
-            {id: 3, building_id: 3, full_name: 'ตึกธนาคารไทยพาณิชย์', short_name: 'ตึกไทยพาณิชย์'},
+            {id: 3, building_id: 3, full_name: 'ธนาคารไทยพาณิชย์', short_name: 'ตึกไทยพาณิชย์'},
         ]);
 
         const statuses = ref([
@@ -113,6 +128,7 @@ export default {
         };
 
         const restoreMeetingRoom = (mRoom) => {
+            toast.removeAllGroups()
             Inertia.patch( route('restore_meeting_room', mRoom), { preserveState: true }, {
                 onSuccess: () => {
                         deletedMeetingRooms.value = usePage().props.value.dmrooms_tranform
@@ -120,18 +136,48 @@ export default {
                 },
                 onError: (errors) => {
                     console.log(errors.msg)
-                    toast.add({severity:'error', summary: 'Failure', detail: 'ยกเลิกการลบห้องประชุมไม่สำเร็จ', life: 3000});
+                    console.log(errors.sysmsg)
+                    toast.add({severity:'error', summary: 'Failure', detail: `ยกเลิกการลบห้องประชุมไม่สำเร็จ เนื่องจาก ${errors.sysmsg}`, group: 'errorkey'});
                 },
                 onFinish: () => {
-                    console.log('finish')
+                    console.log('Restore Finish')
+                }
+            });
+        };
+
+        const confirmDeleteMeetingRoom = (mRoom) => {
+            toast.removeAllGroups()
+            meetingRoom.value = mRoom;
+            permananceDeleteMeetingRoomDialog.value = true;
+        }
+
+        const permananceDeleteMeetingRoom = () => {
+            //console.log(meetingRoom.value.id)
+            // ถ้ามีการใช้งาน dialog จะไม่สามารถใช้งาน preserveState: true ได้ เพราะจะทำให้ dialog จะยังคงอยู่
+            Inertia.delete(route('delete_meeting_room_permanance', meetingRoom.value.id), {
+                onSuccess: () => {
+                    // console.log("on success")
+                    // console.log(usePage().props.value.dmrooms_tranform)
+                    deletedMeetingRooms.value = usePage().props.value.dmrooms_tranform
+                    toast.add({severity:'success', summary: 'Successful', detail: 'ลบห้องประชุมแบบถาวรเรียบร้อย', life: 3000});
+                },
+                onError: (errors) => {
+                    console.log(errors.msg)
+                    console.log(errors.sysmsg)
+                    toast.add({severity:'error', summary: 'Failure', detail: `ยกเลิกการลบห้องประชุมแบบถาวรไม่สำเร็จ เนื่องจาก ${errors.sysmsg}`, group: 'errorkey'});
+                },
+                onFinish: () => {
+                    console.log('Permanance Delete Finish')
+                    permananceDeleteMeetingRoomDialog.value = false;
+                    meetingRoom.value = {};
                 }
             });
         };
    
         return { 
-            filters, submitted, deletedMeetingRooms,
+            dt, filters, deletedMeetingRooms, permananceDeleteMeetingRoomDialog, meetingRoom,
             building, statuses,
-            thaiStatus, getBuildingName, restoreMeetingRoom,  //Method
+            thaiStatus, getBuildingName, restoreMeetingRoom, permananceDeleteMeetingRoom, confirmDeleteMeetingRoom  //Method
         }
     }
 }
