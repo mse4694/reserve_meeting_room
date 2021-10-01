@@ -9,7 +9,7 @@
             <div class="ml-4 mr-4">
                 <Toolbar>
                     <template #left>
-                        <div class="mt-2 px-2"><Button label="เพิ่ม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
+                        <div class="mt-2 px-2"><Button label="เพิ่มห้องประชุม" icon="pi pi-plus" class="p-button-success p-button-sm" @click="openNew"/></div>
                         <!-- <div class="mt-2"><Button label="ลบ" icon="pi pi-trash" class="p-button-warning p-button-sm"  @click="confirmDeleteSelected" :disabled="!selectedMeetingRooms || !selectedMeetingRooms.length" /></div> -->
                     </template>
                     <template #right>

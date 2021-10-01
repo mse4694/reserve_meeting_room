@@ -100,9 +100,9 @@ class MeetingroomController extends Controller
         // );
 
         $building_id = Request::input('building_id');
-        $floor = Request::input('floor');
-        $capacity = ['normal' => Request::input('capacity_normal'), 'min' => Request::input('capacity_min'), 'max' => Request::input('capacity_max')];
-        $price = ['half_day' => Request::input('price_half_day'), 'full_day' => Request::input('price_full_day')];
+        $floor = (int) Request::input('floor');
+        $capacity = ['normal' => (int) Request::input('capacity_normal'), 'min' => (int) Request::input('capacity_min'), 'max' => (int) Request::input('capacity_max')];
+        $price = ['half_day' => (int) Request::input('price_half_day'), 'full_day' => (int) Request::input('price_full_day')];
         $fullname = Request::input('fullname');
         $shortname = Request::input('shortname');
         $description = ['description'=>Request::input('description')];
@@ -217,16 +217,12 @@ class MeetingroomController extends Controller
         // );
 
         //\Log::info(Request::all());
-
-        //$building_id = Request::input('building_id');
-        $floor = Request::input('floor');
-        $capacity = ['normal' => Request::input('capacity_normal'), 'min' => Request::input('capacity_min'), 'max' => Request::input('capacity_max')];
-        $price = ['half_day' => Request::input('price_half_day'), 'full_day' => Request::input('price_full_day')];
+        $floor = (int) Request::input('floor');
+        $capacity = ['normal' => (int) Request::input('capacity_normal'), 'min' => (int) Request::input('capacity_min'), 'max' => (int) Request::input('capacity_max')];
+        $price = ['half_day' => (int) Request::input('price_half_day'), 'full_day' => (int) Request::input('price_full_day')];
         $fullname = Request::input('fullname');
         $shortname = Request::input('shortname');
-        //$description = Request::input('description');
-        $description = ['description'=>Request::input('description')];
-        //$status = Request::input('status');
+        $description = ['description' => Request::input('description')];
         $userin = '10039018';
         $user_last_act = '10039019';
         $oldimage1 = Request::input('oldimage1');
