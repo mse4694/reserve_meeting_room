@@ -36,7 +36,7 @@
                     <!-- <Column selectionMode="multiple" :exportable="false" style="max-width:3rem"/> -->
                     <!-- <Column selectionMode="single" :exportable="false" style="max-width:3rem"/> -->
 
-                    <Column header="รูปห้อง" >
+                    <Column header="รูปห้อง">
                         <template #body="slotProps">
                             <!-- <Image :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" preview /> -->
                             <img :src="`/storage/picture/${slotProps.data.image1}`" :alt="slotProps.data.image2" class="meeting_room-image" @click="showGallery(slotProps.data)"/>

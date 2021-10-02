@@ -78,7 +78,7 @@
                     </div>
                 </div> -->
 
-                <div v-for="(obj, index) in objectives" class="bg-gray-100 mx-auto border-gray-500 border rounded-md text-gray-700 mb-0.5 mt-0.5 h-19">
+                <!-- <div v-for="obj in objectives" :key="obj.id" class="bg-gray-100 mx-auto border-gray-500 border rounded-md text-gray-700 mb-0.5 mt-0.5 h-19">
                     <div class="flex p-1 border-l-8 border-blue-600 rounded-md">
                         <div class="space-y-1 border-r-2 pr-3">
                             <div class="text-sm leading-5 font-semibold"><span class="text-xs leading-4 font-normal text-gray-500"> สร้างเมื่อ #</span> {{ obj.create }}</div>
@@ -96,19 +96,24 @@
                             <div class="mr-1"><Button icon="pi pi-trash" class="p-button-sm p-button-rounded p-button-warning" /></div>
                         </div>   
                     </div>
+                </div> -->
+                <!-- <ObjectiveTable :objectives="$page.props.departments"/> -->
+                <div class="mt-2">
+                    <ObjectiveTable :objectives="objectives" @editObjective="editObjective"/>
                 </div>
+                
             </div>
 
             <Dialog v-model:visible="objectiveDialog" :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '50vw'}" header="วัตถุประสงค์การใช้ห้อง" :modal="true" class="p-fluid">
                 <div class="mb-4">
                     <label for="room_full_name">วัตถุประสงค์</label>
-                    <InputText v-model.trim="oForm.objective" required="true" :class="{'p-invalid': submitted }" />
+                    <InputText v-model.trim="oForm.objective_name" required="true" :class="{'p-invalid': submitted }" />
                     <small class="p-error" v-if="submitted">จำเป็นต้องใส่ วัตถุประสงค์</small>
                 </div>
 
                 <div class="mb-4">
                     <label for="room_short_name">รายละเอียดเพิ่มเติม</label>
-                    <InputText v-model.trim="oForm.detail" required="true" :class="{'p-invalid': submitted }" />
+                    <InputText v-model.trim="oForm.objective_detail" required="true" :class="{'p-invalid': submitted }" />
                 </div>
 
                 <template #footer>
@@ -130,10 +135,11 @@ import { ref, onMounted } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/inertia-vue3'
 //import { FilterMatchMode } from 'primevue/api';
 import { useToast } from "primevue/usetoast";
+import ObjectiveTable from "@/Components/Admin/ObjectiveTable.vue"
 
 export default {
     components: {
-        Link,
+        Link, ObjectiveTable,
     },
 
     setup() {
@@ -144,10 +150,12 @@ export default {
 
         const oForm = useForm({
             id: null,
-            objective: null,
-            detail: null,
-            create: '1/10/2564 22:18',
-            update: '2/10/2564 23:00'
+            objective_name: null,
+            objective_detail: null,
+            user_create: '10039018',
+            user_update: '10028111',
+            created_at: '1/10/2564 22:18',
+            updated_at: '2/10/2564 23:00'
         });
         
         const openNew = () => {
@@ -162,16 +170,31 @@ export default {
         };
 
         const saveObjective = () => {
-            objectives.value.push({objective: oForm.objective, detail: oForm.detail, create: oForm.create, update: oForm.update})
-            toast.add({severity:'success', summary: 'สำเร็จ', detail: 'ห้องประชุมที่เลือก ถูกลบแล้ว', life: 3000});
+            objectives.value.push({
+                id: objectives.value.length + 1,
+                objective_name: oForm.objective_name, 
+                objective_detail: oForm.objective_detail,
+                user_create: oForm.user_create,
+                user_update: oForm.user_update, 
+                created_at: oForm.created_at, 
+                updated_at: oForm.updated_at
+            })
+
+            toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุม เรียบร้อย', life: 3000});
             objectiveDialog.value = false
             oForm.reset()
-            console.log(objectives)
+            //console.log(objectives)
+        }
+
+        const editObjective = (objId) => {
+            console.log(objId)
+            oForm.objective_name = objId
+            openNew()
         }
 
         return {
             objectiveDialog, submitted, oForm, objectives, toast,
-            hideDialog, openNew, saveObjective,
+            hideDialog, openNew, saveObjective, editObjective,
         }
     }
 }
