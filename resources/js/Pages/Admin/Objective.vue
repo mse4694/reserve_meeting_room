@@ -99,7 +99,7 @@
                 </div> -->
                 <!-- <ObjectiveTable :objectives="$page.props.departments"/> -->
                 <div class="mt-2">
-                    <ObjectiveTable :objectives="objectives" @editObjective="editObjective"/>
+                    <ObjectiveTable :objectives="$page.props.objectives" @editObjective="editObjective"/>
                 </div>
                 
             </div>
@@ -142,6 +142,10 @@ export default {
         Link, ObjectiveTable,
     },
 
+    props: {
+        objectives: Array,
+    },
+
     setup() {
         const toast = useToast()
         const objectiveDialog = ref(false)
@@ -152,37 +156,80 @@ export default {
             id: null,
             objective_name: null,
             objective_detail: null,
-            user_create: '10039018',
-            user_update: '10028111',
-            created_at: '1/10/2564 22:18',
-            updated_at: '2/10/2564 23:00'
+            userin: '10039018',
+            user_last_act: '10028111'
+            // created_at: '1/10/2564 22:18',
+            // updated_at: '2/10/2564 23:00'
         });
         
         const openNew = () => {
-            submitted.value = false
+            //submitted.value = false
             objectiveDialog.value = true
         };
 
         const hideDialog = () => {
             oForm.reset();
             objectiveDialog.value = false
-            submitted.value = false
+            //submitted.value = false
         };
 
         const saveObjective = () => {
-            objectives.value.push({
-                id: objectives.value.length + 1,
-                objective_name: oForm.objective_name, 
-                objective_detail: oForm.objective_detail,
-                user_create: oForm.user_create,
-                user_update: oForm.user_update, 
-                created_at: oForm.created_at, 
-                updated_at: oForm.updated_at
-            })
+            // objectives.value.push({
+            //     id: objectives.value.length + 1,
+            //     objective_name: oForm.objective_name, 
+            //     objective_detail: oForm.objective_detail,
+            //     userin: oForm.userin,
+            //     user_last_act: oForm.user_last_act, 
+            //     created_at: oForm.created_at, 
+            //     updated_at: oForm.updated_at
+            // })
 
-            toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุม เรียบร้อย', life: 3000});
-            objectiveDialog.value = false
-            oForm.reset()
+            if(oForm.id) {
+                console.log("Edit Data");
+                // //meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
+                // oForm.transform(data => ({
+                //     ...data,
+                //     oldimage1: meetingRoom.value.image1,
+                //     oldimage2: meetingRoom.value.image2,
+                //     oldimage3: meetingRoom.value.image3
+                // })).post(`/mroom/${mRoomForm.id}/update`, {
+                //     // replace: true,
+                //     // onBefore: () => {
+                //     // },
+                //     onSuccess: () => {
+                //         //console.log(page)
+                //         // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
+                //         meetingRooms.value = usePage().props.value.mrooms_tranform
+                //         deletedMeetingRooms.value = usePage().props.value.dmrooms
+                //         toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
+                //     },
+                //     onError: (errors) => {
+                //         console.log(errors)
+                //     },
+                //     onFinish: () => {
+                //         mRoomForm.processing = false 
+                //     }
+                // });
+            } else {
+                oForm.post(route('add_objective'), {
+                    replace: true,
+                    onSuccess: () => {
+                        objectiveDialog.value = false
+                        oForm.reset()
+                        toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุม เรียบร้อย', life: 3000}); 
+                    },
+                    onError: (errors) => {
+                        console.log(errors)
+                    },
+                    onFinish: () => {
+                        oForm.processing = false 
+                    }
+                });
+            }
+
+            //toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุม เรียบร้อย', life: 3000});
+            // objectiveDialog.value = false
+            // oForm.reset()
             //console.log(objectives)
         }
 

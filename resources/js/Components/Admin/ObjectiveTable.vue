@@ -26,17 +26,17 @@
             </thead>
             
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="obj in objectives" :key="obj.objective_name">
+              <tr v-for="obj in objectives" :key="obj.id">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">{{ obj.objective_name }}</div>
                   <div class="text-xs text-gray-500">{{ obj.objective_detail }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ obj.user_create }}</div>
+                  <div class="text-sm text-gray-900">{{ obj.userin }}</div>
                   <div class="text-xs text-gray-500">{{ obj.created_at }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-xs">
-                  <div class="text-sm text-gray-900">{{ obj.user_update }}</div>
+                  <div class="text-sm text-gray-900">{{ obj.user_last_act }}</div>
                   <div class="text-xs text-gray-500">{{ obj.updated_at }}</div>
                 </td>
                 <!-- <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
