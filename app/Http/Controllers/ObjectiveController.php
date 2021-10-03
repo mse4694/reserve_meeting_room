@@ -40,4 +40,37 @@ class ObjectiveController extends Controller
 
         return Redirect::route('manage_objective');
     }
+
+    public function update($id)
+    {
+        // \Log::info(Request::all());
+        // \Log::info($id);
+
+        $objective_name = Request::input('objective_name');
+
+        $objective_detail = Request::input('objective_detail');
+        if( strcmp($objective_detail,'') === 0 ) {
+            $objective_detail = "ยังไม่เคยบันทึกรายละเอียดเกี่ยวกับวัตถุประสงค์การใช้ห้องประชุมนี้";
+        }
+
+        $user_last_act = Request::input('user_last_act');
+
+        //return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => 'Error']);
+        //return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
+        //return Redirect::route('manage_objective');
+
+        try {
+            Objective::whereId((int)$id)
+                        ->update([
+                            'objective_name'=>$objective_name,
+                            'objective_detail'=>$objective_detail,
+                            'user_last_act'=>$user_last_act 
+                        ]);
+        } catch(\Exception  $e) {
+            \Log::info($e->getMessage());
+            return Redirect::back()->withErrors(['msg' => 'fail', 'sysmsg' => $e->getMessage()]);
+        }
+
+        return Redirect::route('manage_objective');
+    }
 }

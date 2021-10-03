@@ -99,7 +99,7 @@
                 </div> -->
                 <!-- <ObjectiveTable :objectives="$page.props.departments"/> -->
                 <div class="mt-2">
-                    <ObjectiveTable :objectives="$page.props.objectives" @editObjective="editObjective"/>
+                    <ObjectiveTable :objectives="$page.props.objectives" @editEvent="editObjective"/>
                 </div>
                 
             </div>
@@ -133,7 +133,6 @@
 import { ref, onMounted } from 'vue';
 //import { Inertia } from '@inertiajs/inertia'
 import { Link, useForm, usePage } from '@inertiajs/inertia-vue3'
-//import { FilterMatchMode } from 'primevue/api';
 import { useToast } from "primevue/usetoast";
 import ObjectiveTable from "@/Components/Admin/ObjectiveTable.vue"
 
@@ -153,24 +152,20 @@ export default {
         const objectives = ref([])
 
         const oForm = useForm({
-            id: null,
+            objective_id: null,
             objective_name: null,
             objective_detail: null,
             userin: '10039018',
             user_last_act: '10028111'
-            // created_at: '1/10/2564 22:18',
-            // updated_at: '2/10/2564 23:00'
         });
         
         const openNew = () => {
-            //submitted.value = false
             objectiveDialog.value = true
         };
 
         const hideDialog = () => {
             oForm.reset();
             objectiveDialog.value = false
-            //submitted.value = false
         };
 
         const saveObjective = () => {
@@ -184,58 +179,52 @@ export default {
             //     updated_at: oForm.updated_at
             // })
 
-            if(oForm.id) {
-                console.log("Edit Data");
-                // //meetingRooms[findIndexById(meetingRoom.id)] = meetingRoom;
-                // oForm.transform(data => ({
-                //     ...data,
-                //     oldimage1: meetingRoom.value.image1,
-                //     oldimage2: meetingRoom.value.image2,
-                //     oldimage3: meetingRoom.value.image3
-                // })).post(`/mroom/${mRoomForm.id}/update`, {
-                //     // replace: true,
-                //     // onBefore: () => {
-                //     // },
-                //     onSuccess: () => {
-                //         //console.log(page)
-                //         // หลังจากเพิ่มข้อมูลลง DB ให้ get list ห้องมาใหม่เพื่อให้ datatable แสดงผลได้ถูกต้อง
-                //         meetingRooms.value = usePage().props.value.mrooms_tranform
-                //         deletedMeetingRooms.value = usePage().props.value.dmrooms
-                //         toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขข้อมูลห้องประชุมเรียบร้อย', life: 3000});
-                //     },
-                //     onError: (errors) => {
-                //         console.log(errors)
-                //     },
-                //     onFinish: () => {
-                //         mRoomForm.processing = false 
-                //     }
-                // });
+            if(oForm.objective_id) {
+                //Edit Data
+                oForm.patch(route('update_objective', oForm.objective_id), {
+                    replace: true,
+                    onSuccess: () => {
+                        oForm.reset()
+                        toast.add({severity:'success', summary: 'Successful', detail: 'แก้ไขวัตถุประสงค์การใช้ห้องประชุมเรียบร้อย', life: 3000});
+                    },
+                    onError: (errors) => {
+                        // console.log(errors.msg)
+                        // console.log(errors.sysmsg)
+                        oForm.reset()
+                        toast.add({severity:'error', summary: 'Failure', detail: `แก้ไขวัตถุประสงค์การใช้ห้องประชุมไม่สำเร็จ เนื่องจาก ${errors.sysmsg}`, group: 'errorkey'});
+                    },
+                    onFinish: () => {
+                        objectiveDialog.value = false
+                        oForm.processing = false 
+                    }
+                });
             } else {
                 oForm.post(route('add_objective'), {
                     replace: true,
                     onSuccess: () => {
-                        objectiveDialog.value = false
                         oForm.reset()
-                        toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุม เรียบร้อย', life: 3000}); 
+                        toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุมเรียบร้อย', life: 3000}); 
                     },
                     onError: (errors) => {
-                        console.log(errors)
+                        // console.log(errors.msg)
+                        // console.log(errors.sysmsg)
+                        oForm.reset()
+                        toast.add({severity:'error', summary: 'Failure', detail: `จัดเก็บวัตถุประสงค์การใช้ห้องประชุมไม่สำเร็จ เนื่องจาก ${errors.sysmsg}`, group: 'errorkey'});
                     },
                     onFinish: () => {
+                        objectiveDialog.value = false
                         oForm.processing = false 
                     }
                 });
             }
-
-            //toast.add({severity:'success', summary: 'สำเร็จ', detail: 'จัดเก็บวัตถุประสงค์การใช้ห้องประชุม เรียบร้อย', life: 3000});
-            // objectiveDialog.value = false
-            // oForm.reset()
-            //console.log(objectives)
         }
 
         const editObjective = (objId) => {
-            console.log(objId)
-            oForm.objective_name = objId
+            //console.log(objId)
+            let indexId = objId - 1
+            oForm.objective_id = usePage().props.value.objectives[indexId].id
+            oForm.objective_name = usePage().props.value.objectives[indexId].objective_name
+            oForm.objective_detail = usePage().props.value.objectives[indexId].objective_detail
             openNew()
         }
 

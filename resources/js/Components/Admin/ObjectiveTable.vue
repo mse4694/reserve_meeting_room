@@ -5,15 +5,15 @@
         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
           <table class="min-w-full divide-y divide-gray-200">
             <!-- <thead class="bg-green-50"> -->
-            <thead class="bg-blue-100">
+            <thead class="bg-blue-500">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-white uppercase tracking-wider">
                   วัตถุประสงค์การใช้ห้อง
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-white uppercase tracking-wider">
                   ผู้เพิ่มข้อมูล
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-white uppercase tracking-wider">
                   ผู้อัพเดทข้อมูล
                 </th>
                 <!-- <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
@@ -33,17 +33,17 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">{{ obj.userin }}</div>
-                  <div class="text-xs text-gray-500">{{ obj.created_at }}</div>
+                  <div class="text-xs text-gray-500">{{ getHumanDate(obj.created_at) }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-xs">
                   <div class="text-sm text-gray-900">{{ obj.user_last_act }}</div>
-                  <div class="text-xs text-gray-500">{{ obj.updated_at }}</div>
+                  <div class="text-xs text-gray-500">{{ getHumanDate(obj.updated_at) }}</div>
                 </td>
                 <!-- <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                   {{ getHumanDate(obj.updated_at) }}
                 </td> -->
                 <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900 mx-1 p-2 border rounded-md bg-yellow-100" @click="$emit('editObjective', obj.id)"><i class="pi pi-pencil"></i> แก้ไข</a>
+                  <a href="#" class="text-indigo-600 hover:text-indigo-900 mx-1 p-2 border rounded-md bg-yellow-100" @click="$emit('editEvent', obj.id)"><i class="pi pi-pencil"></i> แก้ไข</a>
                   <a href="#" class="text-indigo-600 hover:text-indigo-900 mx-1 p-2 border rounded-md bg-red-300"><i class="pi pi-trash"></i> ลบ</a>
                 </td>
               </tr>
@@ -59,34 +59,21 @@
 </template>
 
 <script>
-//import moment from 'moment'
-// const people = [
-//   {
-//     name: 'Jane Cooper',
-//     title: 'Regional Paradigm Technician',
-//     department: 'Optimization',
-//     role: 'Admin',
-//     email: 'jane.cooper@example.com',
-//     image:
-//       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60',
-//   },
-//   // More people...
-// ]
 
+import moment from 'moment'
 export default {
   props: {
     objectives: Array,
   },
 
-  emits: ['editObjective'],
+  emits: ['editEvent'],
 
   setup() {
-    // const getHumanDate = (data) => {
-    //             return moment(data).locale('th').fromNow();
-    // }
-    //console.log(departments)
+    const getHumanDate = (data) => {
+                return moment(data).locale('th').fromNow();
+    }
     return {
-        //getHumanDate,
+        getHumanDate,
     }
   },
 }

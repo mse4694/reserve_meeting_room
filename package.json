@@ -25,6 +25,7 @@
         "laravel-mix": "^6.0.31",
         "lodash": "^4.17.19",
         "mitt": "^3.0.0",
+        "moment": "^2.29.1",
         "postcss": "^8.3.7",
         "primeicons": "^4.1.0",
         "primevue": "^3.7.1",

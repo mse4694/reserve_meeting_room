@@ -43,3 +43,4 @@ Route::delete('/mroom/{id}/pdelete', [RecycleBinMeetingRoomController::class, 'd
 //วัตถุประสงค์การใช้ห้องประชุม
 Route::get('/objective', [ObjectiveController::class, 'index'])->name('manage_objective');
 Route::post('/objective/add', [ObjectiveController::class, 'store'])->name('add_objective');
+Route::patch('/objective/{id}/update', [ObjectiveController::class, 'update'])->name('update_objective');
