@@ -5,8 +5,11 @@
             <div class="ml-4 mr-4">
                 <Toolbar>
                     <template #left>
+                        <Dropdown v-model="selectedWorkUnit" :options="workunits" optionLabel="name" optionValue="code" placeholder="เลือกหน่วยงาน" />
                         <div class="mt-2 px-2"><Button label="หน่วยงานภายใน" icon="pi pi-home" class="p-button-info p-button-sm" /></div>
+                        <i class="pi pi-bars p-toolbar-separator mr-2" />
                         <div class="mt-2 px-2"><Button label="หน่วยงานภายนอก" icon="pi pi-globe" class="p-button-help p-button-sm" /></div>
+                        <i class="pi pi-bars p-toolbar-separator mr-2" />
                         <div class="mt-2 px-2"><Button label="บริษัทต่างๆ" icon="pi pi-briefcase" class="p-button-secondary p-button-sm" /></div>
                     </template>
                 </Toolbar>
@@ -203,7 +206,25 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
 export default {
-    
+    setup() {
+        const selectedWorkUnit = ref()
+        const workunits = ref([
+			{name: 'หน่วยงานภายใน', code: 'NY'},
+			{name: 'หน่วยงานภายนอก', code: 'RM'},
+			{name: 'บริษัทต่างๆ', code: 'LDN'}
+		])
+
+        return {
+            workunits, selectedWorkUnit
+        }
+    }
 }
 </script>
+
+<style scoped>
+.p-dropdown {
+    width: 14rem;
+}
+</style>
