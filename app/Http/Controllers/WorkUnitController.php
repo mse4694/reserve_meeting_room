@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
+use App\Models\Workunit;
 
 class WorkUnitController extends Controller
 {
@@ -15,8 +16,16 @@ class WorkUnitController extends Controller
      */
     public function index()
     {
+        \Log::info(Request::all());
+        $workunit_type = Request::input('selectedWorkUnit');
+        if( strcmp($workunit_type, '') === 0) {
+            $workunits = [];
+        } else {
+            $workunits = Workunit::where('workunit_type', $workunit_type)->get();
+        }
+        //$objectives = Objective::all();
         //return Inertia::render('Admin/Objective', ['objectives' => $objectives]);
-        return Inertia::render('Admin/WorkUnit');
+        return Inertia::render('Admin/WorkUnit', ['workunits' => $workunits]);
     }
 
     /**
