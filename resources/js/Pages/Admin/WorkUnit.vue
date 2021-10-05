@@ -1,16 +1,21 @@
 <template>
 <AppLayout>
+    <div class="flex flex-1 flex-col sm:flex-row items-end ">
+        <div class="flex flex-1 flex-col sm:flex-row items-end">
+            <div class="mb-1 px-2"><Dropdown v-model="selectedWorkUnit" :options="workunits" optionLabel="name" optionValue="type" placeholder="เลือกหน่วยงาน" /></div>
+            <div class="mb-1 px-2"><Button label="ค้นหา" icon="pi pi-search" class="p-button-info p-button-sm"/></div>
+        </div>
+        <div>
+            <div class="mb-1 px-2"><Button label="เพิ่มหน่วยงาน" icon="pi pi-plus" class="p-button-primary p-button-sm"/></div>
+        </div>
+    </div>
+    <div class="mt-2">
     <Card>
         <template #content>
             <div class="ml-4 mr-4">
                 <Toolbar>
-                    <template #left>
-                        <Dropdown v-model="selectedWorkUnit" :options="workunits" optionLabel="name" optionValue="code" placeholder="เลือกหน่วยงาน" />
-                        <div class="mt-2 px-2"><Button label="หน่วยงานภายใน" icon="pi pi-home" class="p-button-info p-button-sm" /></div>
+                    <template #left>           
                         <i class="pi pi-bars p-toolbar-separator mr-2" />
-                        <div class="mt-2 px-2"><Button label="หน่วยงานภายนอก" icon="pi pi-globe" class="p-button-help p-button-sm" /></div>
-                        <i class="pi pi-bars p-toolbar-separator mr-2" />
-                        <div class="mt-2 px-2"><Button label="บริษัทต่างๆ" icon="pi pi-briefcase" class="p-button-secondary p-button-sm" /></div>
                     </template>
                 </Toolbar>
                 <!-- หน่วยงานภายใน
@@ -200,6 +205,7 @@
             </div>
         </template>
     </Card>
+    </div>
     <Toast position="top-right" />
     <Toast position="center" group="errorkey" />
 </AppLayout>
@@ -208,16 +214,17 @@
 <script>
 import { ref, onMounted } from 'vue';
 export default {
+    
     setup() {
         const selectedWorkUnit = ref()
         const workunits = ref([
-			{name: 'หน่วยงานภายใน', code: 'NY'},
-			{name: 'หน่วยงานภายนอก', code: 'RM'},
-			{name: 'บริษัทต่างๆ', code: 'LDN'}
+			{name: 'หน่วยงานภายใน', type: 'internal'},
+			{name: 'หน่วยงานภายนอก', type: 'external'},
+			{name: 'บริษัทต่างๆ', type: 'company'}
 		])
 
         return {
-            workunits, selectedWorkUnit
+            workunits, selectedWorkUnit,
         }
     }
 }
@@ -226,5 +233,9 @@ export default {
 <style scoped>
 .p-dropdown {
     width: 14rem;
+}
+
+.p-ripple.purple .p-ink {
+    background: rgba(256,39,176,.3);
 }
 </style>
