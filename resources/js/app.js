@@ -127,7 +127,7 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)
-      .use(PrimeVue, {
+      .use(PrimeVue, { ripple: true }, {
         locale: {
           startsWith: 'Starts with',
           contains: 'Contains',

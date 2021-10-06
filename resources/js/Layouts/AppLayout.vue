@@ -6,7 +6,7 @@
 
       <div class="w-full bg-gray-100 pl-0 lg:pl-64 min-h-screen" :class="sideBarOpen ? 'overlay' : ''" id="main-content">
 
-        <Navbar @toggleSidebar="sideMenuShowHide" />
+        <Navbar @toggleSidebar="sideMenuShowHide"/>
 
         <div class="p-6 bg-gray-100 mb-20">
             <!-- Page Content -->
@@ -35,13 +35,13 @@ export default {
       const sideBarOpen = ref(false)
 
       const sideMenuShowHide = () => {
-        sideBarOpen.value = !sideBarOpen.value
+          sideBarOpen.value = !sideBarOpen.value
         //console.log(sideBarOpen.value)
       }
 
       return {
         sideBarOpen,
-        sideMenuShowHide
+        sideMenuShowHide,
       }
     },
 }

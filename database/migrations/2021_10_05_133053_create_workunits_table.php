@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateObjectivesTable extends Migration
+class CreateWorkunitsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateObjectivesTable extends Migration
      */
     public function up()
     {
-        Schema::create('objectives', function (Blueprint $table) {
+        Schema::create('workunits', function (Blueprint $table) {
             $table->id();
-            $table->string('objective_name');
-            $table->string('objective_detail', 500)->nullable();
+            $table->string('workunit_name');
+            $table->string('workunit_type');
+            $table->string('workunit_detail', 500)->nullable();
             $table->string('userin');
             $table->string('user_last_act')->nullable();
             $table->timestamps();
@@ -31,6 +32,6 @@ class CreateObjectivesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('objectives');
+        Schema::dropIfExists('workunits');
     }
 }

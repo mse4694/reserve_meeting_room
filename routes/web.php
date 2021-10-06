@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\MeetingroomController;
 use App\Http\Controllers\RecycleBinMeetingRoomController;
 use App\Http\Controllers\ObjectiveController;
+use App\Http\Controllers\WorkUnitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +41,10 @@ Route::get('/mroom/recycle_bin', [RecycleBinMeetingRoomController::class, 'index
 Route::patch('/mroom/{id}/restore', [RecycleBinMeetingRoomController::class, 'store'])->name('restore_meeting_room');
 Route::delete('/mroom/{id}/pdelete', [RecycleBinMeetingRoomController::class, 'destroy'])->name('delete_meeting_room_permanance');
 
-//วัตถุประสงค์การใช้ห้องประชุม
+//ObjectiveController => วัตถุประสงค์การใช้ห้องประชุม
 Route::get('/objective', [ObjectiveController::class, 'index'])->name('manage_objective');
 Route::post('/objective/add', [ObjectiveController::class, 'store'])->name('add_objective');
 Route::patch('/objective/{id}/update', [ObjectiveController::class, 'update'])->name('update_objective');
+
+//หน่วยงาน
+Route::get('/workunit', [WorkUnitController::class, 'index'])->name('manage_workunit');
