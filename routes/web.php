@@ -48,3 +48,9 @@ Route::patch('/objective/{id}/update', [ObjectiveController::class, 'update'])->
 
 //หน่วยงาน
 Route::get('/workunit', [WorkUnitController::class, 'index'])->name('manage_workunit');
+
+
+//แสดง Event
+Route::get('/eventDisplay', function () {
+    return Inertia::render('EventDisplay');
+})->name('event_display');
