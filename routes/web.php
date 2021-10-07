@@ -51,6 +51,7 @@ Route::get('/workunit', [WorkUnitController::class, 'index'])->name('manage_work
 
 
 //แสดง Event
-Route::get('/eventDisplay', function () {
-    return Inertia::render('EventDisplay');
+Route::get('/eventDisplay/{eventId}', function ( $eventId ) {
+    \Log::info($eventId);
+    return Inertia::render('EventDisplay', ['eventDetail' => $eventId]);
 })->name('event_display');

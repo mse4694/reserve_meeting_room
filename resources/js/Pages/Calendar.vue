@@ -1,13 +1,19 @@
 <template>
     <AppLayout>
         <div>
-            <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions" />
+            <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions">
+                <!-- <template v-slot:eventContent='arg'>
+                    <b>{{ arg.timeText }}</b>
+                    <i>{{ arg.event.title }}</i>
+                </template> -->
+            </FullCalendar>
         </div>
     </AppLayout>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
+import { Inertia } from '@inertiajs/inertia'
 import AppLayout from '@/Layouts/AppLayout.vue';
 //import '@fullcalendar/core/vdom' // solves problem with Vite
 import '@fullcalendar/core';
@@ -43,7 +49,7 @@ export default {
                 right: 'dayGridMonth,listMonth timeGridWeek,listWeek timeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
             },
             //editable: true,
-            //selectable:true, 
+            selectable:true, 
             //selectMirror: true,
             dayMaxEvents: 3,
             customButtons: {
@@ -89,25 +95,11 @@ export default {
                 second: '2-digit',
                 hour12: false
             },
-
-            //dateClick: this.handleDateClick,
             dateClick: function(info) {
-                alert('Clicked on: ' + info.dateStr);
-                // alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-                // alert('Current view: ' + info.view.type);
-                // Comment change the day's background color just for fun
-                //info.dayEl.style.backgroundColor = 'red';
+                handleDateClick(info)
             },
             eventClick: function(info) {
-                //alert('Event: ' + info.event.title);
-                //window.open("https://www.w3schools.com", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
-                window.open(route('event_display'), "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
-                
-                //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-                //alert('View: ' + info.view.type);
-
-                // change the border color just for fun
-                //info.el.style.borderColor = 'red';
+                handleEventClick(info)
             }
         });
 
@@ -125,10 +117,37 @@ export default {
                 {"id": 11,"title": "Birthday Party","start": "2021-10-13T07:00:00"},
                 {"id": 12,"title": "Click for Google","url": "https://www.google.com/","start": "2021-10-28"},
                 {"id": 13,"title": "ประชุมหน่วย IT ประจำเดือน เพื่อปรับปรุงขั้นตอนการทำงาน","start": "2021-10-28", "color": "black"}
-        ])
+        ]);
+
+        const handleDateClick = (info) => {
+            alert('Clicked on: ' + info.dateStr);
+            // alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+            // alert('Current view: ' + info.view.type);
+            // Comment change the day's background color just for fun
+            //info.dayEl.style.backgroundColor = 'red';
+        }
+
+        const handleEventClick = (info) => {
+            //alert('Event: ' + info.event.title);
+            //console.log(info.event)
+            //let eventObject = ref({'id': info.event.id, 'title': info.event.title})
+            //console.log(eventObject.value)
+            //window.open("https://www.w3schools.com", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
+            window.open(route('event_display', info.event.id), "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
+            
+            //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+            //alert('View: ' + info.view.type);
+
+            // change the border color just for fun
+            //info.el.style.borderColor = 'red';
+        }
 
         const eventService = ref(new EventService());
-        return { calendarOptions, events, eventService, fullCalendar };
+        
+        return { 
+            calendarOptions, events, eventService, fullCalendar, 
+            handleDateClick, handleEventClick,    // Method
+        }
     },
 }
 </script>
