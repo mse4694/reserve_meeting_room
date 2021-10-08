@@ -1,7 +1,7 @@
 <template>
     <AppLayout>
         <div>
-            <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions">
+            <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions" :resources="resources">
                 <!-- <template v-slot:eventContent='arg'>
                     <b>{{ arg.timeText }}</b>
                     <i>{{ arg.event.title }}</i>
@@ -15,12 +15,13 @@
 import { ref, onMounted } from 'vue';
 import { Inertia } from '@inertiajs/inertia'
 import AppLayout from '@/Layouts/AppLayout.vue';
-//import '@fullcalendar/core/vdom' // solves problem with Vite
+import '@fullcalendar/core/vdom' // solves problem with Vite
 import '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import interactionPlugin from '@fullcalendar/interaction'
+import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import thLocale from '@fullcalendar/core/locales/th'
 import EventService from '@/Services/EventService'
 
@@ -29,24 +30,55 @@ export default {
         AppLayout,
     },
     setup() {
-        // onMounted(() => {
+         onMounted(() => {
         //     eventService.value.getEvents().then(data => {
         //         events.value = data;
         //         // console.log(data);
         //         // console.log(eventService.value.getEvents());
         //         // console.log(events.value);
         //     });
-        // })
+            axios.get(route('get_event_resources')).then(res => {
+                rtemp.value = res.data
+                //console.log(rtemp.value)
+                //resources.value = res.data
+                //console.log(resources.value)
+            });
+            //axios.get(route('get_event_resources')).then(res => console.log(res.data));
+            //console.log(rtemp.value)
+        })
 
+        const rtemp = ref([])
         const fullCalendar = ref(null)
+        const resources = ref([
+                {'id':1, 'title':'วีกิจ'},
+                {'id':2, 'title':'จงจินต์'},
+                {'id':3, 'title':'ตั้งภรณ์พรรณ'}
+        ]);
+        //const resources = rtemp.value
         const calendarOptions =  ref({
-            plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
+            schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+            plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin, resourceTimeGridPlugin],
             locale: thLocale,
             //initialDate : '2021-08-01',
+            // resources: [
+            //     {'id':1, 'title':'roomA'},
+            //     {'id':2, 'title':'roomB'},
+            //     {'id':3, 'title':'roomC'}
+            // ],
+            resources: resources.value,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,listMonth timeGridWeek,listWeek timeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
+                right: 'dayGridMonth,listMonth timeGridWeek,listWeek resourceTimeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
+                //right: 'dayGridMonth,listMonth timeGridWeek,listWeek timeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
+            },
+            navLinks: true,
+            businessHours: true,
+            businessHours: {
+                // days of week. an array of zero-based day of week integers (0=Sunday)
+                daysOfWeek: [ 1, 2, 3, 4, 5 ], // Monday - Thursday
+                startTime: '08:00', // a start time (10am in this example)
+                endTime: '17:00', // an end time (6pm in this example)
             },
             //editable: true,
             selectable:true, 
@@ -60,6 +92,7 @@ export default {
                         //console.log(fullCalendar.value)
                         fullCalendar.value.calendar.prev();
                         console.log(fullCalendar.value.calendar.currentData.currentDate.getMonth()+1)
+                        //console.log(resources.value)
                     }
                 },
 
@@ -83,18 +116,19 @@ export default {
                 }
 
             },
-            
+            nowIndicator: true,  // แสดง เส้นกำกับว่าเวลาปัจจุบันตอนนี้อยู่ที่เวลาไหน บน TimeGrid view ต่างๆ
             showNonCurrentDates: false,   // ไม่ให้เห็น วันอื่นๆที่ไม่ได้อยู่ในเดือนนั้นๆ จากหน้าของ dayGridMonth 
             //eventDisplay: 'block',
             //displayEventTime: false,
             //defaultAllDay: false,
-            displayEventEnd: true,  // บังคับแสดง เวลาที่จบ event นั้นๆ
+            //displayEventEnd: true,  // บังคับแสดง เวลาที่จบ event นั้นๆ
             eventTimeFormat: { // like '14:30:00'
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
                 hour12: false
             },
+            //eventOrder: ["title","duration", "start", "end"], // ใน 1 วันจะเรียง event ให้ดูตาม order ที่เราตั้งเอาไว้ ถ้ามีหลาย event defaut คือ "start,-duration,allDay,title"
             dateClick: function(info) {
                 handleDateClick(info)
             },
@@ -104,19 +138,19 @@ export default {
         });
 
         const events =  ref([
-                {"id": 1,"title": "All Day Event","start": "2021-10-01"},
-                {"id": 2,"title": "Long Event","start": "2021-10-07","end": "2021-10-10"},
-                {"id": 3,"title": "Repeating Event","start": "2021-10-09T16:00:00"},
-                {"id": 4,"title": "Repeating Event","start": "2021-10-16T16:00:00","end": "2021-10-16T17:00:00", "color": "green"},
-                {"id": 5,"title": "Conference","start": "2021-10-11","end": "2021-10-13"},
-                {"id": 6,"title": "Meeting","start": "2021-10-12T10:30:00","end": "2021-10-12T12:37:00"},
-                {"id": 7,"title": "Lunch","start": "2021-10-12T12:00:00"},
-                {"id": 8,"title": "Meeting","start": "2021-10-12T14:30:00"},
-                {"id": 9,"title": "Happy Hour","start": "2021-10-12T17:30:00"},
-                {"id": 10,"title": "Dinner","start": "2021-10-12T20:00:00"},
-                {"id": 11,"title": "Birthday Party","start": "2021-10-13T07:00:00"},
-                {"id": 12,"title": "Click for Google","url": "https://www.google.com/","start": "2021-10-28"},
-                {"id": 13,"title": "ประชุมหน่วย IT ประจำเดือน เพื่อปรับปรุงขั้นตอนการทำงาน","start": "2021-10-28", "color": "black"}
+                {"id": 1,"title": "All Day Event","start": "2021-10-01", "resourceId": '1'},
+                {"id": 2,"title": "Long Event","start": "2021-10-07","end": "2021-10-10", "resourceId": '1'},
+                {"id": 3,"title": "Repeating Event","start": "2021-10-09T16:00:00", "resourceId": '2'},
+                {"id": 4,"title": "Repeating Event","start": "2021-10-16T16:00:00","end": "2021-10-16T17:00:00", "color": "green", "resourceId": '1'},
+                {"id": 5,"title": "Conference","start": "2021-10-11","end": "2021-10-13", "resourceId": '3'},
+                {"id": 6,"title": "Meeting","start": "2021-10-12T10:30:00","end": "2021-10-12T12:37:00", "resourceId": '3'},
+                {"id": 7,"title": "Lunch","start": "2021-10-12T12:00:00", "resourceId": '2'},
+                {"id": 8,"title": "Meeting","start": "2021-10-12T14:30:00", "resourceId": '1'},
+                {"id": 9,"title": "Happy Hour","start": "2021-10-12T17:30:00", "resourceId": '3'},
+                {"id": 10,"title": "Dinner","start": "2021-10-12T20:00:00", "resourceId": '2'},
+                {"id": 11,"title": "Birthday Party","start": "2021-10-13T07:00:00", "resourceId": '1'},
+                {"id": 12,"title": "Click for Google","url": "https://www.google.com/","start": "2021-10-28", "resourceId": '1'},
+                {"id": 13,"title": "ประชุมหน่วย IT ประจำเดือน เพื่อปรับปรุงขั้นตอนการทำงาน","start": "2021-10-28T13:00:00","end": "2021-10-28T16:30:00", "color": "black", "resourceId": '2'}
         ]);
 
         const handleDateClick = (info) => {
@@ -145,7 +179,7 @@ export default {
         const eventService = ref(new EventService());
         
         return { 
-            calendarOptions, events, eventService, fullCalendar, 
+            calendarOptions, events, eventService, fullCalendar, resources, rtemp, 
             handleDateClick, handleEventClick,    // Method
         }
     },
@@ -153,14 +187,48 @@ export default {
 </script>
 
 <style scoped>
+/* @import '@fullcalendar/core/main.css'; */
+@import '@fullcalendar/daygrid/main.css';
+@import '@fullcalendar/timegrid/main.css';
+@import '@fullcalendar/list/main.css';
 @media screen and (max-width: 960px) {
     ::v-deep(.fc-header-toolbar) {
         display: flex;
         flex-wrap: wrap;
     }
-/* @import '@fullcalendar/core/main.css';
-@import '@fullcalendar/daygrid/main.css';
-@import '@fullcalendar/timegrid/main.css';
-@import '@fullcalendar/list/main.css'; */
 }
+/* :root {
+  --fc-small-font-size: .85em;
+  --fc-page-bg-color: #fff;
+  --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
+  --fc-neutral-text-color: #808080;
+  --fc-border-color: #ddd;
+
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: #2C3E50;
+  --fc-button-border-color: #2C3E50;
+  --fc-button-hover-bg-color: #1e2b37;
+  --fc-button-hover-border-color: #1a252f;
+  --fc-button-active-bg-color: #1a252f;
+  --fc-button-active-border-color: #151e27;
+
+  --fc-event-bg-color: #3788d8;
+  --fc-event-border-color: #3788d8;
+  --fc-event-text-color: #fff;
+  --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+  --fc-more-link-bg-color: #d0d0d0;
+  --fc-more-link-text-color: inherit;
+
+  --fc-event-resizer-thickness: 8px;
+  --fc-event-resizer-dot-total-width: 8px;
+  --fc-event-resizer-dot-border-width: 1px;
+
+  --fc-non-business-color: rgba(215, 215, 215, 0.3);
+  --fc-bg-event-color: rgb(143, 223, 130);
+  --fc-bg-event-opacity: 0.3;
+  --fc-highlight-color: rgba(188, 232, 241, 0.3);
+  --fc-today-bg-color: rgba(255, 220, 40, 0.15);
+  --fc-now-indicator-color: red;
+} */
 </style>

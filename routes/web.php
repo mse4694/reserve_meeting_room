@@ -6,6 +6,7 @@ use App\Http\Controllers\MeetingroomController;
 use App\Http\Controllers\RecycleBinMeetingRoomController;
 use App\Http\Controllers\ObjectiveController;
 use App\Http\Controllers\WorkUnitController;
+use App\Http\Controllers\CalendarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,3 +56,5 @@ Route::get('/eventDisplay/{eventId}', function ( $eventId ) {
     \Log::info($eventId);
     return Inertia::render('EventDisplay', ['eventDetail' => $eventId]);
 })->name('event_display');
+
+Route::get('/eventResources', [CalendarController::class, 'index'])->name('get_event_resources');
