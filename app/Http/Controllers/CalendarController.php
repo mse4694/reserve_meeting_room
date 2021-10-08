@@ -29,7 +29,8 @@ class CalendarController extends Controller
         }
         //\Log::info($mrooms_tranform);
         //return response()->json($mrooms_tranform);
-        return $mrooms_tranform;
+        return response()->json(["resources" => $mrooms_tranform]);
+        //return $mrooms_tranform;
     }
 
     /**

@@ -1,7 +1,7 @@
 <template>
     <AppLayout>
         <div>
-            <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions" :resources="resources">
+            <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions">
                 <!-- <template v-slot:eventContent='arg'>
                     <b>{{ arg.timeText }}</b>
                     <i>{{ arg.event.title }}</i>
@@ -30,42 +30,43 @@ export default {
         AppLayout,
     },
     setup() {
-         onMounted(() => {
-        //     eventService.value.getEvents().then(data => {
-        //         events.value = data;
-        //         // console.log(data);
-        //         // console.log(eventService.value.getEvents());
-        //         // console.log(events.value);
+        //  onMounted(() => {
+        // //     eventService.value.getEvents().then(data => {
+        // //         events.value = data;
+        // //         // console.log(data);
+        // //         // console.log(eventService.value.getEvents());
+        // //         // console.log(events.value);
+        // //     });
+        //     axios.get(route('get_event_resources')).then(res => {
+        //         //rtemp.value = res.data.resources
+        //         //console.log(rtemp.value)
+        //         //resources.value = res.data
+        //         //console.log(resources.value)
+        //         console.log(res.data)
+        //         console.log(res.data.resources)
         //     });
-            axios.get(route('get_event_resources')).then(res => {
-                rtemp.value = res.data
-                //console.log(rtemp.value)
-                //resources.value = res.data
-                //console.log(resources.value)
-            });
-            //axios.get(route('get_event_resources')).then(res => console.log(res.data));
-            //console.log(rtemp.value)
-        })
+        //     //axios.get(route('get_event_resources')).then(res => console.log(res.data));
+        //     //console.log(rtemp.value)
+        // })
 
-        const rtemp = ref([])
         const fullCalendar = ref(null)
-        const resources = ref([
-                {'id':1, 'title':'วีกิจ'},
-                {'id':2, 'title':'จงจินต์'},
-                {'id':3, 'title':'ตั้งภรณ์พรรณ'}
-        ]);
-        //const resources = rtemp.value
         const calendarOptions =  ref({
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin, resourceTimeGridPlugin],
             locale: thLocale,
             //initialDate : '2021-08-01',
             // resources: [
-            //     {'id':1, 'title':'roomA'},
-            //     {'id':2, 'title':'roomB'},
-            //     {'id':3, 'title':'roomC'}
+            //     {'id':1, 'title':'วีกิจ'},
+            //     {'id':2, 'title':'จงจินต์'},
+            //     {'id':3, 'title':'ตั้งภรณ์พรรณ'}
             // ],
-            resources: resources.value,
+            resourceOrder: '-title, id',
+            //filterResourcesWithEvents: true, // แสดงเฉพาะห้องที่มี event ในวันนั้นๆ เท่านั้น
+            resources: function(fetchInfo, successCallback, failureCallback) {
+                axios.get(route('get_event_resources')).then(res => {
+                    successCallback(res.data.resources) 
+                });
+            },
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -179,7 +180,7 @@ export default {
         const eventService = ref(new EventService());
         
         return { 
-            calendarOptions, events, eventService, fullCalendar, resources, rtemp, 
+            calendarOptions, events, eventService, fullCalendar,
             handleDateClick, handleEventClick,    // Method
         }
     },
