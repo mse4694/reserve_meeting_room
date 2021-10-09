@@ -168,7 +168,8 @@ export default {
             //let eventObject = ref({'id': info.event.id, 'title': info.event.title})
             //console.log(eventObject.value)
             //window.open("https://www.w3schools.com", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
-            window.open(route('event_display', info.event.id), "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
+            //window.open(route('event_display', info.event.id), "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
+            window.open(route('event_display', info.event.id), "_blank", "");
             
             //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
             //alert('View: ' + info.view.type);
