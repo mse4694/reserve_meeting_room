@@ -18,4 +18,9 @@ class Workunit extends Model
         'userin',
         'user_last_act'
     ];
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }
