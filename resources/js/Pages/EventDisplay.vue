@@ -7,7 +7,9 @@
         </h3>
         <p class="mt-1 max-w-2xl text-sm text-gray-500">
             Event Title Details Show Here.
+            <!-- <Button label="ปิด" class="p-button-sm p-button-raised" @click="closeMe"/> -->
         </p>
+        <span class="cursor-pointer"><Tag value="ปิด" @click="closeMe"></Tag></span>
         </div>
         <div class="border-t border-gray-200">
         <dl>
@@ -109,7 +111,7 @@
             </div>
             <div class="bg-gray-100 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-3">
-                <Button label="ปิด" class="p-button-raised" />
+                <span class="cursor-pointer"><Tag value="ปิด" @click="closeMe"></Tag></span>
             </dd>
             </div>
         </dl>
@@ -127,6 +129,16 @@ export default {
             required: true
         },
     },
+
+    setup(props) {
+        const closeMe = () => {
+            window.close()
+        }
+
+        return {
+            closeMe,
+        }
+    }
 }
 </script>
 

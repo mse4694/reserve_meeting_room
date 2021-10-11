@@ -37,15 +37,6 @@ export default {
         // //         // console.log(eventService.value.getEvents());
         // //         // console.log(events.value);
         // //     });
-        //     axios.get(route('get_event_resources')).then(res => {
-        //         //rtemp.value = res.data.resources
-        //         //console.log(rtemp.value)
-        //         //resources.value = res.data
-        //         //console.log(resources.value)
-        //         console.log(res.data)
-        //         console.log(res.data.resources)
-        //     });
-        //     //axios.get(route('get_event_resources')).then(res => console.log(res.data));
         //     //console.log(rtemp.value)
         // })
 
@@ -70,7 +61,8 @@ export default {
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,listMonth timeGridWeek,listWeek resourceTimeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
+                right: 'dayGridMonth,timeGridWeek,timeGridDay resourceTimeGridDay listWeek' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
+                //right: 'dayGridMonth,listMonth timeGridWeek,listWeek resourceTimeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
                 //right: 'dayGridMonth,listMonth timeGridWeek,listWeek timeGridDay,listDay' // การใส่เครื่องหมาย , (comma) มีผลต่อการแสดงผลบนหน้าจอ จะหมายความว่าจะเป็น element ที่ติดกัน
             },
             navLinks: true,
@@ -87,9 +79,9 @@ export default {
             dayMaxEvents: 3,
             customButtons: {
                 prev: {
-                text: 'ก่อนหน้า',
-                icons: 'left-single-arrow',
-                click: function() {
+                    text: 'ก่อนหน้า',
+                    icons: 'left-single-arrow',
+                    click: function() {
                         //console.log(fullCalendar.value)
                         fullCalendar.value.calendar.prev();
                         console.log(fullCalendar.value.calendar.currentData.currentDate.getMonth()+1)
@@ -98,9 +90,9 @@ export default {
                 },
 
                 next: {
-                text: 'ถัดไป',
-                icons: 'right-single-arrow',
-                click: function() {
+                    text: 'ถัดไป',
+                    icons: 'right-single-arrow',
+                    click: function() {
                         //console.log(fullCalendar.value)
                         fullCalendar.value.calendar.next();
                         console.log(fullCalendar.value.calendar.currentData.currentDate.getMonth()+1)
@@ -108,13 +100,31 @@ export default {
                 },
 
                 today: {
-                text: 'วันนี้',
-                click: function() {
+                    text: 'วันนี้',
+                    click: function() {
                         //console.log(fullCalendar.value)
                         fullCalendar.value.calendar.today();
                         console.log(fullCalendar.value.calendar.currentData.currentDate.getMonth()+1)
                     }
+                },
+
+                resourceTimeGridDay: {
+                    text: 'ห้องประชุมรายวัน',
+                    click: function() {
+                        //console.log(fullCalendar.value)
+                        fullCalendar.value.calendar.changeView('resourceTimeGridDay');
+                    //     fullCalendar.value.options.resources();
+                    //     //fullCalendar.value.calendar.today();
+                    }
+                },
+
+                listWeek: {
+                    text: 'กำหนดการรายสัปดาห์',
+                    click: function() {
+                        fullCalendar.value.calendar.changeView('listWeek');
+                    }
                 }
+
 
             },
             nowIndicator: true,  // แสดง เส้นกำกับว่าเวลาปัจจุบันตอนนี้อยู่ที่เวลาไหน บน TimeGrid view ต่างๆ
@@ -123,10 +133,11 @@ export default {
             //displayEventTime: false,
             //defaultAllDay: false,
             //displayEventEnd: true,  // บังคับแสดง เวลาที่จบ event นั้นๆ
-            eventTimeFormat: { // like '14:30:00'
-                hour: '2-digit',
+            eventTimeFormat: { // like '14:30' or '7:00'
+                //hour: '2-digit',
+                hour: 'numeric',
                 minute: '2-digit',
-                second: '2-digit',
+                //second: '2-digit',
                 hour12: false
             },
             //eventOrder: ["title","duration", "start", "end"], // ใน 1 วันจะเรียง event ให้ดูตาม order ที่เราตั้งเอาไว้ ถ้ามีหลาย event defaut คือ "start,-duration,allDay,title"
@@ -139,19 +150,19 @@ export default {
         });
 
         const events =  ref([
-                {"id": 1,"title": "All Day Event","start": "2021-10-01", "resourceId": '1'},
-                {"id": 2,"title": "Long Event","start": "2021-10-07","end": "2021-10-10", "resourceId": '1'},
-                {"id": 3,"title": "Repeating Event","start": "2021-10-09T16:00:00", "resourceId": '2'},
-                {"id": 4,"title": "Repeating Event","start": "2021-10-16T16:00:00","end": "2021-10-16T17:00:00", "color": "green", "resourceId": '1'},
-                {"id": 5,"title": "Conference","start": "2021-10-11","end": "2021-10-13", "resourceId": '3'},
-                {"id": 6,"title": "Meeting","start": "2021-10-12T10:30:00","end": "2021-10-12T12:37:00", "resourceId": '3'},
-                {"id": 7,"title": "Lunch","start": "2021-10-12T12:00:00", "resourceId": '2'},
-                {"id": 8,"title": "Meeting","start": "2021-10-12T14:30:00", "resourceId": '1'},
-                {"id": 9,"title": "Happy Hour","start": "2021-10-12T17:30:00", "resourceId": '3'},
-                {"id": 10,"title": "Dinner","start": "2021-10-12T20:00:00", "resourceId": '2'},
-                {"id": 11,"title": "Birthday Party","start": "2021-10-13T07:00:00", "resourceId": '1'},
-                {"id": 12,"title": "Click for Google","url": "https://www.google.com/","start": "2021-10-28", "resourceId": '1'},
-                {"id": 13,"title": "ประชุมหน่วย IT ประจำเดือน เพื่อปรับปรุงขั้นตอนการทำงาน","start": "2021-10-28T13:00:00","end": "2021-10-28T16:30:00", "color": "black", "resourceId": '2'}
+                {"id": 1,"title": "All Day Event","start": "2021-10-01", "resourceId": 1},
+                {"id": 2,"title": "Long Event","start": "2021-10-07","end": "2021-10-10", "resourceId": 1},
+                {"id": 3,"title": "Repeating Event","start": "2021-10-09T16:00:00", "resourceId": 2},
+                {"id": 4,"title": "Repeating Event","start": "2021-10-16T16:00:00","end": "2021-10-16T17:00:00", "color": "green", "resourceId": 1},
+                {"id": 5,"title": "Conference","start": "2021-10-11","end": "2021-10-13", "resourceId": 3},
+                {"id": 6,"title": "Meeting","start": "2021-10-12T10:30:00","end": "2021-10-12T12:37:00", "resourceId": 3},
+                {"id": 7,"title": "Lunch","start": "2021-10-12T12:00:00", "resourceId": 2},
+                {"id": 8,"title": "Meeting","start": "2021-10-12T14:30:00", "resourceId": 1},
+                {"id": 9,"title": "Happy Hour","start": "2021-10-12T17:30:00", "resourceId": 3},
+                {"id": 10,"title": "Dinner","start": "2021-10-12T20:00:00", "resourceId": 2},
+                {"id": 11,"title": "Birthday Party","start": "2021-10-13T07:00:00", "resourceId": 1},
+                {"id": 12,"title": "Click for Google","url": "https://www.google.com/","start": "2021-10-28", "resourceId": 1},
+                {"id": 13,"title": "ประชุมหน่วย IT ประจำเดือน เพื่อปรับปรุงขั้นตอนการทำงาน","start": "2021-10-28T13:00:00","end": "2021-10-28T16:30:00", "color": "black", "resourceId": 2}
         ]);
 
         const handleDateClick = (info) => {
