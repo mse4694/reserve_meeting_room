@@ -23,6 +23,8 @@
     @routes
     @inertia
 
+    {{-- <script src="https://unpkg.com/@popperjs/core@2.9.1/dist/umd/popper.min.js" charset="utf-8"></script>
+    <script src='https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js'></script> --}}
     <script>
       const base_url = "{{ env('APP_URL') }}";
     </script>

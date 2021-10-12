@@ -7,6 +7,7 @@ use App\Http\Controllers\RecycleBinMeetingRoomController;
 use App\Http\Controllers\ObjectiveController;
 use App\Http\Controllers\WorkUnitController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,14 +48,17 @@ Route::get('/objective', [ObjectiveController::class, 'index'])->name('manage_ob
 Route::post('/objective/add', [ObjectiveController::class, 'store'])->name('add_objective');
 Route::patch('/objective/{id}/update', [ObjectiveController::class, 'update'])->name('update_objective');
 
-//หน่วยงาน
+//WorkUnitController => หน่วยงาน
 Route::get('/workunit', [WorkUnitController::class, 'index'])->name('manage_workunit');
 
+//EventController => แสดง และ จัดการ event การจองห้องประชุม
+Route::get('/event', [EventController::class, 'index'])->name('event_all');
+Route::get('/event/{id}', [EventController::class, 'show'])->name('event_show');
 
-//แสดง Event
-Route::get('/eventDisplay/{eventId}', function ( $eventId ) {
-    \Log::info($eventId);
-    return Inertia::render('EventDisplay', ['eventDetail' => $eventId]);
-})->name('event_display');
+//แสดง Event 
+// Route::get('/eventDisplay/{eventId}', function ( $eventId ) {
+//     \Log::info($eventId);
+//     return Inertia::render('EventDisplay', ['eventDetail' => $eventId]);
+// })->name('event_display');
 
-Route::get('/eventResources', [CalendarController::class, 'index'])->name('get_event_resources');
+Route::get('/calendarResources', [CalendarController::class, 'index'])->name('get_calendar_resources');

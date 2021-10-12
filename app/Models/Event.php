@@ -10,17 +10,23 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
+        'objective_id',
         'title',
+        'detail',
         'start',
         'end',
+        'prepare',
         'resourceId',
         'attendees',
+        'responsible_person',
         'coordinator',
         'workunit_id',
         'tel',
         'equipment',
         'food_drink',
         'status',
+        'reason',
+        'questionnair',
         'userin',
         'user_last_act'
     ];
@@ -34,5 +40,10 @@ class Event extends Model
     public function workunit()
     {
         return $this->belongsTo(Workunit::class);
+    }
+
+    public function objective()
+    {
+        return $this->belongsTo(Objective::class);
     }
 }
