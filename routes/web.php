@@ -53,7 +53,8 @@ Route::get('/workunit', [WorkUnitController::class, 'index'])->name('manage_work
 
 //EventController => แสดง และ จัดการ event การจองห้องประชุม
 Route::get('/event', [EventController::class, 'index'])->name('event_all');
-Route::get('/event/{id}', [EventController::class, 'show'])->name('event_show');
+Route::get('/event/{id}/show', [EventController::class, 'show'])->name('event_show');
+Route::get('/event/add', [EventController::class, 'create'])->name('event_add');
 
 //แสดง Event 
 // Route::get('/eventDisplay/{eventId}', function ( $eventId ) {

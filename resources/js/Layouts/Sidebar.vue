@@ -331,9 +331,11 @@
           <i :class="reserveRoomMenuOpen ? iconExpland : iconCollapse" class="ml-2" style="fontSize: 0.7rem"></i>
         </div>
         <div :class="reserveRoomMenuOpen ? '' : 'hidden'">
+          <Link :href="route('event_add')">
           <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
             <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>จองห้องประชุม</div>
           </div>
+          </Link>
           <div class=" flex flex-col items-start ml-8 h-10 hover:bg-gray-200 rounded-lg cursor-pointer">
             <div class="mt-2"><i :class="iconSubMenu" class="pr-2 submenu-icon-style"></i>ติดตามผลการจอง</div>
             <!-- <div class="mt-2"><i class="pi pi-minus pr-2" style="color: #66b3ff"></i>ติดตามผลการจอง</div> -->

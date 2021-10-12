@@ -63,7 +63,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('BookingRoom');
     }
 
     /**
@@ -72,7 +72,7 @@ class EventController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         //
     }

@@ -1043,7 +1043,8 @@
   font-size: 1rem;
   color: #3f3f46;
   background: #ffffff;
-  padding: 0.75rem 0.75rem;
+  /* padding: 0.75rem 0.75rem; */
+  padding: 0.4rem 0.4rem;
   border: 1px solid #d4d4d8;
   transition: none;
   appearance: none;

@@ -128,7 +128,8 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)
-      .use(PrimeVue, { ripple: true }, {
+      .use(PrimeVue, {
+        ripple: true,
         locale: {
           startsWith: 'Starts with',
           contains: 'Contains',
@@ -171,7 +172,7 @@ createInertiaApp({
           passwordPrompt: 'Enter a password',
           emptyFilterMessage: 'No results found',
           emptyMessage: 'No available options'
-        },
+        }, 
     })
     //.use(ZiggyVue, Ziggy)
     .use(ToastService)
