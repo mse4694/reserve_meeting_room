@@ -5,96 +5,104 @@
         </div> -->
         <div class="mt-5 sm:mt-0">
             <div class="md:grid md:grid-cols-3 md:gap-6">
-            <div class="md:col-span-1">
-                <div class="px-4 sm:px-0">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">จองห้องประชุม</h3>
-                <p class="mt-1 text-sm text-gray-600">
-                    กรุณาระบุรายละเอียดส่วนแรกเพื่อคัดกรองข้อมูลเบื้องต้น.
-                </p>
-                </div>
-            </div>
-            <div class="mt-5 md:mt-0 md:col-span-2">
-                <form action="#" method="POST">
-                <div class="shadow overflow-hidden sm:rounded-md">
-                    <div class="px-4 py-5 bg-white sm:p-6">
-                    <div class="grid grid-cols-6 gap-6">
-                        <div class="col-span-6 sm:col-span-2">
-                        <label for="workunit_type" class="block text-sm font-medium text-gray-700">ประเภทหน่วยงาน</label>
-                        <select id="workunit_type" name="workunit_type" autocomplete="workunit_type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option>United States</option>
-                            <option>Canada</option>
-                            <option>Mexico</option>
-                        </select>
-                        <!-- <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" /> -->
-                        </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <form action="#" method="POST">
+                    <div class="shadow overflow-hidden sm:rounded-md">
+                        <div class="px-4 py-5 bg-white sm:p-6">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-2">
+                            <label for="workunit_type" class="block text-sm font-medium text-gray-700">ประเภทหน่วยงาน</label>
+                            <select @change="getWorkunitNameFromType(workunit_type)" v-model="workunit_type" id="workunit_type" name="workunit_type" autocomplete="workunit_type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <!-- <option value="null">เลือกประเภทหน่วยงาน</option> -->
+                                <option v-for="(item) in workunit_types" :key="item.index" :value="item.title_en">{{item.title_th}}</option>
+                            </select>
+                            <!-- <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" /> -->
+                            </div>
 
-                        <div class="col-span-6 sm:col-span-4">
-                        <label for="workunit_name" class="block text-sm font-medium text-gray-700">ชื่อหน่วยงาน</label>
-                        <select id="workunit_name" name="workunit_name" autocomplete="workunit_name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option>United States</option>
-                            <option>Canada</option>
-                            <option>Mexico</option>
-                        </select>
-                        <!-- <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" /> -->
-                        </div>
+                            <div class="col-span-6 sm:col-span-4">
+                            <label for="workunit_name" class="block text-sm font-medium text-gray-700">ชื่อหน่วยงาน</label>
+                            <select v-model="workunit_name" id="workunit_name" name="workunit_name" autocomplete="workunit_name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option v-for="(item) in workunits" :key="item.id" :value="item.id">{{item.workunit_name}}</option>
+                            </select>
+                            <!-- <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" /> -->
+                            </div>
 
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="date_start" class="block text-sm font-medium text-gray-700">วันที่จอง</label>
-                            <Calendar id="date_start" dateFormat="dd-mm-yy" v-model="date_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                        </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="date_start" class="block text-sm font-medium text-gray-700">วันที่จอง</label>
+                                <Calendar id="date_start" dateFormat="dd-mm-yy" v-model="date_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                            </div>
 
-                        <div class="col-span-6 sm:col-span-3">
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
+                                <Calendar id="date_end" dateFormat="dd-mm-yy" v-model="date_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-2">
+                            <label for="date_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
+                            <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-2">
                             <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
-                            <Calendar id="date_end" dateFormat="dd-mm-yy" v-model="date_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                        </div>
+                            <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                            </div>
+                            
+                            <div class="col-span-6 sm:col-span-2 ">
+                            <label for="prepare" class="block text-sm font-medium text-gray-700">เวลาเตรียมห้อง</label>
+                            <div class="flex flex-row justify-items-start space-x-2">
+                                <div>
+                                    <ToggleButton v-model="check_prepare" onIcon="pi pi-check" offIcon="pi pi-times" class="focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                                </div>
+                                <div v-if="check_prepare" class="w-full">
+                                    <select v-model="prepare" id="prepare" name="prepare" autocomplete="prepare" class="w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                        <option v-for="(item) in prepare_time" :key="item.value" :value="item.value">{{item.label}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- <input id="prepare" name="prepare" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" /> -->
+                            </div>
 
-                        <div class="col-span-6 sm:col-span-2">
-                        <label for="date_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
-                        <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                        </div>
+                            <div class="col-span-6 sm:col-span-6">
+                            <label for="objective" class="block text-sm font-medium text-gray-700">วัตถุประสงค์</label>
+                            <select v-model="objective" id="objective" name="objective" autocomplete="objective" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option v-for="(item) in objectives" :key="item.id" :value="item.id">{{item.objective_name}}</option>
+                            </select>
+                            </div>
 
-                        <div class="col-span-6 sm:col-span-2">
-                        <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
-                        <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                        </div>
-                        
-                        <div class="col-span-6 sm:col-span-2">
-                        <label for="prepare" class="block text-sm font-medium text-gray-700">เวลาเตรียมห้อง</label>
-                        <input id="prepare" name="prepare" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" />
-                        </div>
+                            <div class="col-span-6 sm:col-span-4">
+                            <label for="attendees" class="block text-sm font-medium text-gray-700">จำนวนผู้เข้าร่วม</label>
+                            <input type="text" name="attendees" id="attendees" autocomplete="email" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                            </div>
 
-                        <div class="col-span-6 sm:col-span-6">
-                        <label for="objective" class="block text-sm font-medium text-gray-700">วัตถุประสงค์</label>
-                        <select id="objective" name="objective" autocomplete="objective" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option>United States</option>
-                            <option>Canada</option>
-                            <option>Mexico</option>
-                        </select>
+                            <div class="col-span-6 sm:col-span-4">
+                            <label for="country" class="block text-sm font-medium text-gray-700">เลือกห้องประชุม</label>
+                            <select id="country" name="country" autocomplete="country" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option>United States</option>
+                                <option>Canada</option>
+                                <option>Mexico</option>
+                            </select>
+                            </div>
                         </div>
-
-                        <div class="col-span-6 sm:col-span-4">
-                        <label for="attendees" class="block text-sm font-medium text-gray-700">จำนวนผู้เข้าร่วม</label>
-                        <input type="text" name="attendees" id="attendees" autocomplete="email" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
                         </div>
-
-                        <div class="col-span-6 sm:col-span-4">
-                        <label for="country" class="block text-sm font-medium text-gray-700">เลือกห้องประชุม</label>
-                        <select id="country" name="country" autocomplete="country" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option>United States</option>
-                            <option>Canada</option>
-                            <option>Mexico</option>
-                        </select>
+                        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            ตรวจสอบ
+                        </button>
                         </div>
                     </div>
+                    </form>
+                </div>
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 mt-4 md:mt-0">จองห้องประชุม</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        กรุณาระบุรายละเอียดส่วนแรกเพื่อคัดกรองข้อมูลเบื้องต้น.
+                    </p>
+                    <div class="mt-2">
+                        <img src="/storage/picture/no_image.jpg" alt="">
                     </div>
-                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        ตรวจสอบ
-                    </button>
                     </div>
                 </div>
-                </form>
-            </div>
             </div>
         </div>
 
@@ -104,7 +112,7 @@
             </div>
         </div>
 
-        <div>
+        <div v-if="canBooking">
             <div class="md:grid md:grid-cols-3 md:gap-6">
             <div class="md:col-span-1">
                 <div class="px-4 sm:px-0">
@@ -200,7 +208,7 @@
             </div>
         </div>
 
-        <div class="mt-10 sm:mt-0">
+        <div v-if="canBooking" class="mt-10 sm:mt-0">
             <div class="md:grid md:grid-cols-3 md:gap-6">
             <div class="md:col-span-1">
                 <div class="px-4 sm:px-0">
@@ -277,7 +285,7 @@
             </div>
         </div>
 
-        <div class="mt-10 sm:mt-0">
+        <div v-if="canBooking" class="mt-10 sm:mt-0">
             <div class="md:grid md:grid-cols-3 md:gap-6">
             <div class="md:col-span-1">
                 <div class="px-4 sm:px-0">
@@ -364,16 +372,80 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 export default {
     setup() {
-        const date_start = ref(null)
-        const date_end = ref(null)
+        onMounted(() => {
+            axios.get(route('get_workunit_type')).then(res => {
+                    //console.log(res.data.workunit_type)
+                    workunit_types.value = res.data.workunit_types
+                    workunit_type.value = workunit_types.value[0].title_en
+                    //console.log(workunit_types.value[0].title_en)
+            });
+
+            axios.get(route('get_workunit_name_from_type', 'internal')).then(res => {
+                    //console.log(res.data)
+                    workunits.value = res.data.workunits
+                    workunit_name.value = workunits.value[0].id
+                    //console.log(events.value)
+            });
+
+            axios.get(route('get_objective')).then(res => {
+                    //console.log(res.data.objectives)
+                    objectives.value = res.data.objectives
+                    objective.value = objectives.value[0].id
+                    //console.log(events.value)
+            });
+
+            axios.get(route('get_meeting_room')).then(res => {
+                    //console.log(res.data.mrooms)
+                    meetingRooms.value = res.data.mrooms
+            });
+        })
+        const workunits = ref([])
+        const workunit_name = ref()
+        const workunit_types = ref([])
+        const workunit_type = ref()
+        const objectives = ref([])
+        const objective = ref()
+        const date_start = ref(new Date())
+        const date_end = ref(new Date())
         const time_start = ref(null)
         const time_end = ref(null)
+        const canBooking = ref(false)
+        const check_prepare = ref(false)
+        const prepare = ref()
+        const prepare_time = ref([
+	     	{label: '5 นาที', value: 5},
+	     	{label: '10 นาที', value: 10},
+            {label: '15 นาที', value: 15},
+        ])
+        const meetingRooms = ref([])
+        const filterMrooms = ref([])
+
+        const getWorkunitNameFromType = (param) => {
+            //console.log(param)
+            axios.get(route('get_workunit_name_from_type', param)).then(res => {
+                    //console.log(res.data)
+                    workunits.value = res.data.workunits
+                    workunit_name.value = workunits.value[0].id
+                    //console.log(events.value)
+            });
+        }
+
+        //const countDeletedMeetingRooms = computed(() => { return deletedMeetingRooms.value })
+
+        const filterMeetingRooms = () => {
+            meetingRooms.value = meetingRooms.value.filter(val => !selectedMeetingRooms.value.includes(val));
+            // deleteMeetingRoomsDialog.value = false;
+            // selectedMeetingRooms.value = null;
+            // toast.add({severity:'success', summary: 'สำเร็จ', detail: 'ห้องประชุมที่เลือก ถูกลบแล้ว', life: 3000});
+        }
 
         return {
-            date_start, date_end, time_start, time_end
+            workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, canBooking,
+            objectives, objective, check_prepare, prepare_time, prepare, filterMrooms, meetingRooms, 
+            getWorkunitNameFromType, filterMeetingRooms, 
         }
     }
 }

@@ -1749,7 +1749,8 @@
 .p-button.p-button-icon-only {
   /* width: 3rem; */
   width: 2rem;
-  padding: 0.75rem 0;
+  /* padding: 0.75rem 0; */
+  padding: 0.5rem 0;
 }
 .p-button.p-button-icon-only .p-button-icon-left,
 .p-button.p-button-icon-only .p-button-icon-right {

@@ -8,6 +8,7 @@ use App\Http\Controllers\ObjectiveController;
 use App\Http\Controllers\WorkUnitController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\UtilityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,3 +64,9 @@ Route::get('/event/add', [EventController::class, 'create'])->name('event_add');
 // })->name('event_display');
 
 Route::get('/calendarResources', [CalendarController::class, 'index'])->name('get_calendar_resources');
+
+//UtilityController => 
+Route::get('/utils/get_workunit_type',[UtilityController::class, 'getWorkunitType'])->name('get_workunit_type');
+Route::get('/utils/get_workunit_name_from_type/{workunit_type}',[UtilityController::class, 'getWorkunitNameFromType'])->name('get_workunit_name_from_type');
+Route::get('/utils/get_objective',[UtilityController::class, 'getObjective'])->name('get_objective');
+Route::get('/utils/get_meeting_room',[UtilityController::class, 'getMeetingRoom'])->name('get_meeting_room');
