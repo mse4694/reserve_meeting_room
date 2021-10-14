@@ -22,17 +22,44 @@
                                 <select v-model="workunit_name" id="workunit_name" name="workunit_name" autocomplete="workunit_name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     <option v-for="(item) in workunits" :key="item.id" :value="item.id">{{item.workunit_name}}</option>
                                 </select>
-                                <!-- <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" /> -->
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_start" class="block text-sm font-medium text-gray-700">วันที่จอง</label>
-                                <Calendar id="date_start" dateFormat="dd-mm-yy" v-model="date_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                                <Calendar v-if="isAdmin" id="date_start" dateFormat="dd-mm-yy" v-model="date_start"
+                                    :show-button-bar="true" 
+                                    :month-navigator="true" 
+                                    :year-navigator="true"
+                                    year-range="2010:2050" 
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </Calendar>
+                                <Calendar v-else id="date_start" dateFormat="dd-mm-yy" v-model="date_start" 
+                                    :disabledDays="[0,6]"
+                                    :show-button-bar="true" 
+                                    :month-navigator="true" 
+                                    :year-navigator="true"
+                                    year-range="2010:2050" 
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </Calendar>
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
-                                <Calendar id="date_end" dateFormat="dd-mm-yy" v-model="date_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                                <Calendar v-if="isAdmin" id="date_end" dateFormat="dd-mm-yy" v-model="date_end"
+                                    :show-button-bar="true" 
+                                    :month-navigator="true" 
+                                    :year-navigator="true"
+                                    year-range="2010:2050"
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </Calendar>
+                                <Calendar v-else id="date_end" dateFormat="dd-mm-yy" v-model="date_end" 
+                                    :disabledDays="[0,6]"
+                                    :show-button-bar="true" 
+                                    :month-navigator="true" 
+                                    :year-navigator="true"
+                                    year-range="2010:2050"
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </Calendar>
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
@@ -62,7 +89,7 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนเวลา</label>
-                                <div class="w-full h-10 items-end text-sm text-red-500">{{showDateCount}}</div>
+                                <div class="w-full h-10 items-end text-sm text-red-500">{{showTimeCount}}</div>
                             </div>
                             
                             <div class="col-span-6 sm:col-span-4 ">
@@ -395,12 +422,14 @@
             </div>
             </div>
         </div>
+        <Toast position="top-right" />
     </AppLayout>
 </template>
 
 <script>
 import moment from 'moment'
 import { ref, onMounted, computed } from 'vue'
+import { useToast } from "primevue/usetoast";
 export default {
     setup() {
         onMounted(() => {
@@ -430,6 +459,8 @@ export default {
                     meetingRooms.value = res.data.mrooms
             });
         })
+
+        const toast = useToast();
         const workunits = ref([])
         const workunit_name = ref()
         const workunit_types = ref([])
@@ -438,8 +469,8 @@ export default {
         const objective = ref()
         const date_start = ref(new Date())
         const date_end = ref(new Date())
-        const time_start = ref(null)
-        const time_end = ref(null)
+        const time_start = ref(moment().add(1, 'hours').minute(0).toDate())
+        const time_end = ref(moment().add(1, 'hours').minute(0).toDate())
         const canBooking = ref(false)
         const check_prepare = ref(false)
         const prepare_time = ref([
@@ -498,8 +529,16 @@ export default {
         })
 
         const showDateCount = computed(() => {
+            if( !date_start.value || !date_end.value) {
+                return `วันที่จองไม่ถูกต้อง`
+            }
+
             if( moment(date_start.value).isSame(date_end.value, 'day') ) {
                 return moment(date_end.value).locale('th').format("ตรงกับวัน dddd")
+            }
+
+            if( moment(date_start.value).isAfter(date_end.value, 'day') ) {
+                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'วันสิ้นสุดการจองย้อนหลัง วันเริ่มจอง', life: 3000});
             }
 
             let start = moment(date_start.value).dayOfYear()
@@ -514,16 +553,28 @@ export default {
 
             if( diff > 0) {
                 return `${diff} วัน`
-            } else if(diff < 0) {
-                return `ไม่สามารถคำนวนวันได้`
+            } else if(diff <= 0) {
+                date_start.value = new Date()
+                date_end.value = new Date()
+                return `reset วันเป็นวันปัจจุบัน`
+                //return `ไม่สามารถคำนวนวันได้`
             } 
+        })
+
+        const showTimeCount = computed(() => {
+            let start = moment(time_start.value)
+            let end = moment(time_end.value)
+            let diff = end.diff(start, 'hours', true)
+            //console.log(`${diff} ชั่วโมง`)
+            //console.log(moment().add(1, 'hours').minute(0).toDate())
+            return `${diff} ชั่วโมง`
         })
 
         return {
             workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, canBooking,
             objectives, objective, check_prepare, prepare_time, prepare, filterMrooms, meetingRooms,
             individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, isAdmin, attendees, selectedMroom, isLongEvent, 
-            getWorkunitNameFromType, filterMeetingRooms, showDateCount,  // Method
+            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount,  // Method
         }
     }
 }
