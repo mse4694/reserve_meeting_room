@@ -86,7 +86,7 @@ class UtilityController extends Controller
 
     public function getWorkunitType()
     {
-        $types = Workunit::select('workunit_type')->distinct()->get();
+        $types = Workunit::select('workunit_type')->distinct()->orderBy('workunit_type','desc')->get();
         if(count($types)) {
             $index = 0;
             foreach($types as $type){
@@ -121,7 +121,7 @@ class UtilityController extends Controller
     public function getWorkunitNameFromType($workunit_type)
     {
         //\Log::info($workunit_type);
-        $workunits = Workunit::where('workunit_type', $workunit_type)->get();
+        $workunits = Workunit::where('workunit_type', $workunit_type)->orderBy('id','desc')->get();
         return response()->json(["workunits" => $workunits]);
     }
 
@@ -138,7 +138,7 @@ class UtilityController extends Controller
             foreach($mrooms as $mroom){
                 $mrooms_tranform[] = [
                     'id'=>$mroom->id,
-                    'label'=>$mroom->fullname.' รองรับได้ ('.$mroom->capacity['min'].' - '.$mroom->capacity['max'].') คน',
+                    'label'=>$mroom->shortname.' รองรับ ('.$mroom->capacity['min'].' - '.$mroom->capacity['max'].') คน',
                     'capacity_min'=>(int)$mroom->capacity['min'],
                     'capacity_max'=>(int)$mroom->capacity['max'],
                     'image1'=>$mroom->img_file['img1'],
