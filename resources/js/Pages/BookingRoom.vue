@@ -63,7 +63,7 @@
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนวัน</label>
+                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนวันจอง</label>
                                 <div class="w-full h-10 items-end text-sm text-red-500">{{showDateCount}}</div>
                             </div>
 
@@ -80,6 +80,25 @@
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
                                 <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                                <!-- v-calendar -->
+                                <Datepicker uid="first" v-model="vdate" dark/>
+                                <div><Datepicker uid="second" v-model="vtime" timePicker dark :autoPosition="false"/></div>
+                                <!-- <DatePicker
+                                    v-model="vdate"
+                                    mode="time" 
+                                    :is24hr="true"
+                                    color="red"
+                                    is-dark
+                                /> -->
+                                <!-- <DatePicker mode="time" :is24hr="true" v-model="vdate" locale="th" color="Indigo" is-dark>
+                                    <template v-slot="{ inputValue, inputEvents }">
+                                        <input
+                                        class="bg-white border px-2 py-2 focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                        :value="inputValue"
+                                        v-on="inputEvents"
+                                        />
+                                    </template>
+                                </DatePicker> -->
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
@@ -88,7 +107,7 @@
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนเวลา</label>
+                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนเวลาจอง</label>
                                 <div class="w-full h-10 items-end text-sm text-red-500">{{showTimeCount}}</div>
                             </div>
                             
@@ -108,6 +127,12 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-2">
+                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนเวลาเตรียม</label>
+                                <div v-if="check_prepare" class="w-full h-10 items-end text-sm text-red-500">{{prepare}} นาที</div>
+                                <div v-else class="w-full h-10 items-end text-sm text-red-500">ไม่ใช้เวลาเตรียมห้อง</div>
                             </div>
 
                             <div class="col-span-6 sm:col-span-4">
@@ -130,6 +155,12 @@
                                     <option v-for="(item) in filterMrooms" :key="item.id" :value="item.id">{{item.label}}</option>
                                 </select>
                             </div>
+
+                            <div class="col-span-6 sm:col-span-2">
+                                <label for="date_end" class="block text-sm font-medium text-gray-700">ผลการตรวจสอบ</label>
+                                <div v-if="check_prepare" class="w-full h-10 items-end text-sm text-red-500">{{prepare}} นาที</div>
+                                <div v-else class="w-full h-10 items-end text-sm text-blue-500">ยังไม่ได้ตรวจสอบ</div>
+                            </div>
                         </div>
                         </div>
                         <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
@@ -138,7 +169,11 @@
                                 <ToggleButton v-model="isAdmin" onIcon="pi pi-check" offIcon="pi pi-times" class="focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
                             </div>
                             <div>
-                                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <button type="submit" 
+                                    :disabled="!canCheckEvent" 
+                                    :class="canCheckEvent ? 'text-white bg-indigo-600 hover:bg-indigo-700' : 'text-black bg-gray-500 cursor-default'" 
+                                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
                                     ตรวจสอบ
                                 </button>
                             </div>
@@ -429,8 +464,13 @@
 <script>
 import moment from 'moment'
 import { ref, onMounted, computed } from 'vue'
-import { useToast } from "primevue/usetoast";
+import { useToast } from "primevue/usetoast"
+import Datepicker from 'vue3-date-time-picker'
+//import 'vue3-date-time-picker/dist/main.css'
 export default {
+    components: {
+        Datepicker,
+    },
     setup() {
         onMounted(() => {
             axios.get(route('get_workunit_type')).then(res => {
@@ -467,10 +507,12 @@ export default {
         const workunit_type = ref()
         const objectives = ref([])
         const objective = ref()
-        const date_start = ref(new Date())
-        const date_end = ref(new Date())
-        const time_start = ref(moment().add(1, 'hours').minute(0).toDate())
-        const time_end = ref(moment().add(1, 'hours').minute(0).toDate())
+        const date_start = ref(moment().startOf('day').toDate())
+        const date_end = ref(moment().startOf('day').toDate())
+        // const time_start = ref(null)
+        // const time_end = ref(null)
+        const time_start = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
+        const time_end = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
         const canBooking = ref(false)
         const check_prepare = ref(false)
         const prepare_time = ref([
@@ -505,6 +547,17 @@ export default {
         const isAdmin = ref(true)
         const selectedMroom = ref(0)
         const isLongEvent = ref(false)
+        const checkDate = ref(false)
+        const checkTime = ref(false)
+        const checkAttendees = ref(false)
+        const canCheckEvent = ref(false)
+        const vtime = ref({ 
+            hours: moment().hour(6).toDate(),
+            minutes: moment().minute(0).toDate()
+        });
+        const vdate = ref(new Date())
+        const vlocale = ref('th-TH')
+        const timezone = ref('')
 
         const getWorkunitNameFromType = (param) => {
             //console.log(param)
@@ -528,52 +581,77 @@ export default {
             //console.log(filterMrooms.value)
         })
 
+        // const resetDefaultDate = () => {
+        //     date_start.value = moment().startOf('day').toDate()
+        //     date_end.value = moment().startOf('day').toDate()
+        // }
+
         const showDateCount = computed(() => {
+            // console.log(date_start.value)
+            // console.log(date_end.value)
+            // console.log(moment(date_end.value).diff(moment(date_start.value), 'days', true) + 1)
+
             if( !date_start.value || !date_end.value) {
+                checkDate.value = false
                 return `วันที่จองไม่ถูกต้อง`
             }
 
-            if( moment(date_start.value).isSame(date_end.value, 'day') ) {
-                return moment(date_end.value).locale('th').format("ตรงกับวัน dddd")
+            if( moment(date_start.value).isBefore(moment().startOf('day')) || moment(date_end.value).isBefore(moment().startOf('day'))) {
+                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองห้อง ย้อนหลังจากวันที่ปัจจุบันได้', life: 5000});
+                checkDate.value = false
+                return `วันจองไม่ถูกต้อง`
             }
 
-            if( moment(date_start.value).isAfter(date_end.value, 'day') ) {
-                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'วันสิ้นสุดการจองย้อนหลัง วันเริ่มจอง', life: 3000});
+            if( moment(date_start.value).isAfter(date_end.value, 'day') ) {   
+                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'วันสิ้นสุดการจอง ไม่สามารถ ย้อนหลังจากวันที่เริ่มจองได้', life: 5000});
+                //resetDefaultDate()
+                checkDate.value = false
+                return `วันจองไม่ถูกต้อง`
             }
 
-            let start = moment(date_start.value).dayOfYear()
-            let end = moment(date_end.value).dayOfYear() + 1   //ที่ต้องบวก 1 เพราะต้องนับวันของตัวเองเป็น 1 วันด้วย 
-            //let diff = end.diff(start, 'days')
-            let diff = end - start
+            // คำนวนความต่างของวัน
+            let diff = moment(date_end.value).diff(moment(date_start.value), 'days', true) + 1  // ที่ต้อง +1 เพราะต้องนับวันที่เริ่มจองด้วย ไม่งั้นจะได้แค่ค่าความต่างของวัน
+
+            // ตรวจสอบว่าเป็นการจองยาวเกิน 3 วัน หรือไม่ ถ้าเกิน 3 วันให้แสดง วันเสริม ให้เลือก
             if( diff >= 3 ) {
                 isLongEvent.value = true
             } else {
                 isLongEvent.value = false
             }
 
-            if( diff > 0) {
+            if( diff === 1 ) { // case วันเริ่มจอง กับ วันสิ้นสุดการจอง เป็นวันเดียวกันให้แสดง เป็นชื่อวัน
+                checkDate.value = true
+                return moment(date_end.value).locale('th').format("ตรงกับวัน dddd")
+            } else if ( diff > 1 && diff <= 365 ) {  // case จองได้ตามปกติ แสดงผลวันเป็นจำนวนวันจอง
+                checkDate.value = true
                 return `${diff} วัน`
-            } else if(diff <= 0) {
-                date_start.value = new Date()
-                date_end.value = new Date()
-                return `reset วันเป็นวันปัจจุบัน`
-                //return `ไม่สามารถคำนวนวันได้`
+            } else if(diff > 365) {  // case จองไม่ได้เพราะจองเกิน 365 วัน
+                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองได้เกิน 365 วัน', life: 5000});
+                checkDate.value = false
+                return `วันจองไม่ถูกต้อง`
+                //resetDefaultDate()
             } 
         })
 
         const showTimeCount = computed(() => {
-            let start = moment(time_start.value)
-            let end = moment(time_end.value)
-            let diff = end.diff(start, 'hours', true)
-            //console.log(`${diff} ชั่วโมง`)
+            if( !time_start.value || !time_end.value) {
+                return `เวลาจองไม่ถูกต้อง`
+            }
+            let start = moment(time_start.value, 'HH:mm')
+            let end = moment(time_end.value, 'HH:mm')
+            //let diff = end.diff(start, 'hours', true)
+            let diffTime = end.diff(start, 'hours', true)
+            //console.log(diffTime)
+            console.log(`${diffTime} ชั่วโมง`)
             //console.log(moment().add(1, 'hours').minute(0).toDate())
-            return `${diff} ชั่วโมง`
+            return `${diffTime} ชั่วโมง`
         })
 
         return {
-            workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, canBooking,
-            objectives, objective, check_prepare, prepare_time, prepare, filterMrooms, meetingRooms,
-            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, isAdmin, attendees, selectedMroom, isLongEvent, 
+            workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, 
+            objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms,
+            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vlocale, timezone, vtime, vdate,
+            checkDate, checkTime, checkAttendees, isLongEvent, isAdmin, canBooking, check_prepare, canCheckEvent,  // Boolean
             getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount,  // Method
         }
     }
@@ -581,5 +659,5 @@ export default {
 </script>
 
 <style scoped>
-
+/* @import 'vue3-date-time-picker/src/Vue3DatePicker/styles/main.scss'; */
 </style>
