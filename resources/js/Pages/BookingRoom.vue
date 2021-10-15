@@ -79,31 +79,59 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
-                                <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                                <!-- v-calendar -->
-                                <Datepicker uid="first" v-model="vdate" dark/>
-                                <div><Datepicker uid="second" v-model="vtime" timePicker dark :autoPosition="false"/></div>
-                                <!-- <DatePicker
-                                    v-model="vdate"
-                                    mode="time" 
-                                    :is24hr="true"
-                                    color="red"
-                                    is-dark
-                                /> -->
-                                <!-- <DatePicker mode="time" :is24hr="true" v-model="vdate" locale="th" color="Indigo" is-dark>
-                                    <template v-slot="{ inputValue, inputEvents }">
-                                        <input
-                                        class="bg-white border px-2 py-2 focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                        :value="inputValue"
-                                        v-on="inputEvents"
-                                        />
+                                <!-- <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
+                                <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
+                                <Datepicker uid="first" v-model="vtime1" timePicker
+                                    inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"  
+                                    locale="th"
+                                    cancelText="ยกเลิก"
+                                    selectText="เลือก"
+                                    minutesGridIncrement="30"
+                                    minutesIncrement="30"
+                                    :clearable="false"
+                                    :filters="{ 
+                                                times: {
+                                                    hours: [1, 2, 3, 4, 5, 19, 20, 21, 22, 23, 24], // disable specific hours
+                                                    minutes: [] // disable sepcific minutes
+                                                }   
+                                            }"
+                                >
+                                    <template #input-icon>
+                                        <i class="pi pi-clock mx-1" style="fontSize: 1.3rem"></i>
                                     </template>
-                                </DatePicker> -->
+                                    <template #clear-icon>
+                                        <i class="pi pi-times mx-1" style="fontSize: 1rem"></i>
+                                    </template>
+                                </Datepicker>
+                                
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
-                                <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                                <!-- <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
+                                <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
+                                <Datepicker uid="second" v-model="vtime2" timePicker
+                                    inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" 
+                                    locale="th"
+                                    cancelText="ยกเลิก"
+                                    selectText="เลือก"
+                                    minutesGridIncrement="30"
+                                    minutesIncrement="30"
+                                    :clearable="false"
+                                    :filters="{ 
+                                                times: {
+                                                    hours: [1, 2, 3, 4, 5, 19, 20, 21, 22, 23, 24], // disable specific hours
+                                                    minutes: [] // disable sepcific minutes
+                                                }   
+                                            }"
+                                >
+                                    <template #input-icon>
+                                        <i class="pi pi-clock mx-1" style="fontSize: 1.3rem"></i>
+                                    </template>
+                                    <template #clear-icon>
+                                        <i class="pi pi-times mx-1" style="fontSize: 1rem"></i>
+                                    </template>
+                                </Datepicker>
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
@@ -466,7 +494,7 @@ import moment from 'moment'
 import { ref, onMounted, computed } from 'vue'
 import { useToast } from "primevue/usetoast"
 import Datepicker from 'vue3-date-time-picker'
-//import 'vue3-date-time-picker/dist/main.css'
+
 export default {
     components: {
         Datepicker,
@@ -551,13 +579,14 @@ export default {
         const checkTime = ref(false)
         const checkAttendees = ref(false)
         const canCheckEvent = ref(false)
-        const vtime = ref({ 
-            hours: moment().hour(6).toDate(),
-            minutes: moment().minute(0).toDate()
+        const vtime1 = ref({ 
+            hours: 8,
+            minutes: 30
         });
-        const vdate = ref(new Date())
-        const vlocale = ref('th-TH')
-        const timezone = ref('')
+        const vtime2 = ref({ 
+            hours: 9,
+            minutes: 0
+        });
 
         const getWorkunitNameFromType = (param) => {
             //console.log(param)
@@ -650,7 +679,7 @@ export default {
         return {
             workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, 
             objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms,
-            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vlocale, timezone, vtime, vdate,
+            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vtime1, vtime2,
             checkDate, checkTime, checkAttendees, isLongEvent, isAdmin, canBooking, check_prepare, canCheckEvent,  // Boolean
             getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount,  // Method
         }
@@ -659,5 +688,6 @@ export default {
 </script>
 
 <style scoped>
+@import 'vue3-date-time-picker/dist/main.css'
 /* @import 'vue3-date-time-picker/src/Vue3DatePicker/styles/main.scss'; */
 </style>
