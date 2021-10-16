@@ -26,40 +26,67 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_start" class="block text-sm font-medium text-gray-700">วันที่จอง</label>
-                                <Calendar v-if="isAdmin" id="date_start" dateFormat="dd-mm-yy" v-model="date_start"
+                                <!-- <Calendar id="date_start" dateFormat="dd-mm-yy" v-model="date_start"
+                                    :disabledDays="isAdmin ? [] : [0,6]"
                                     :show-button-bar="true" 
                                     :month-navigator="true" 
                                     :year-navigator="true"
                                     year-range="2010:2050" 
                                     class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </Calendar>
-                                <Calendar v-else id="date_start" dateFormat="dd-mm-yy" v-model="date_start" 
-                                    :disabledDays="[0,6]"
-                                    :show-button-bar="true" 
-                                    :month-navigator="true" 
-                                    :year-navigator="true"
-                                    year-range="2010:2050" 
-                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </Calendar>
+                                </Calendar> -->
+                                
+                                <Datepicker uid="firstDate" v-model="date_start" 
+                                    :month-year-component="monthYearStart"
+                                    locale="th"
+                                    cancelText="ยกเลิก"
+                                    selectText="เลือก"
+                                    :format="datePreviewFormat"
+                                    :previewFormat="datePreviewFormat"
+                                    :enableTimePicker="false"
+                                    :clearable="false"
+                                    :minDate="new Date()"
+                                    :yearRange="[2021, 2041]"
+                                    :disabledDates="disabledDates"  
+                                >
+                                    <template #input-icon>
+                                        <i class="pi pi-calendar mx-1" style="fontSize: 1.3rem"></i>
+                                    </template>
+                                </Datepicker>
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
-                                <Calendar v-if="isAdmin" id="date_end" dateFormat="dd-mm-yy" v-model="date_end"
+                                <!-- <Calendar id="date_end" dateFormat="dd-mm-yy" v-model="date_end"
+                                    :disabledDays="isAdmin ? [] : [0,6]"
                                     :show-button-bar="true" 
                                     :month-navigator="true" 
                                     :year-navigator="true"
-                                    year-range="2010:2050"
-                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </Calendar>
-                                <Calendar v-else id="date_end" dateFormat="dd-mm-yy" v-model="date_end" 
-                                    :disabledDays="[0,6]"
-                                    :show-button-bar="true" 
-                                    :month-navigator="true" 
-                                    :year-navigator="true"
-                                    year-range="2010:2050"
-                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </Calendar>
+                                    year-range="2021:2041"
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                >
+                                    <template #header>Header Content</template>
+                                </Calendar> -->
+
+                                <Datepicker uid="secondDate" v-model="date_end" 
+                                    :month-year-component="monthYearStart"
+                                    locale="th"
+                                    cancelText="ยกเลิก"
+                                    selectText="เลือก"
+                                    :format="datePreviewFormat"
+                                    :previewFormat="datePreviewFormat"
+                                    :enableTimePicker="false"
+                                    :clearable="false"
+                                    :minDate="new Date()"
+                                    :maxDate="date_end_max"
+                                    :yearRange="[2021, 2041]"
+                                    :disabledDates="['28','29']"
+                                      
+                                >
+                                    <template #input-icon>
+                                        <i class="pi pi-calendar mx-1" style="fontSize: 1.3rem"></i>
+                                    </template>
+                                </Datepicker>
+                                
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
@@ -81,7 +108,7 @@
                                 <label for="date_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
                                 <!-- <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
                                 <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
-                                <Datepicker uid="first" v-model="vtime1" timePicker
+                                <Datepicker uid="firstTime" v-model="vtimeStart" timePicker
                                     inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"  
                                     locale="th"
                                     cancelText="ยกเลิก"
@@ -110,7 +137,7 @@
                                 <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
                                 <!-- <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
                                 <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
-                                <Datepicker uid="second" v-model="vtime2" timePicker
+                                <Datepicker uid="secondTime" v-model="vtimeEnd" timePicker
                                     inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" 
                                     locale="th"
                                     cancelText="ยกเลิก"
@@ -216,7 +243,7 @@
                         กรุณาระบุรายละเอียดส่วนแรกเพื่อคัดกรองข้อมูลเบื้องต้น.
                     </p>
                     <div class="mt-2">
-                        <img src="/storage/picture/no_image.jpg" alt="">
+                        <img src="/storage/picture/no_image3.jpg" alt="">
                     </div>
                     </div>
                 </div>
@@ -491,9 +518,11 @@
 
 <script>
 import moment from 'moment'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, defineAsyncComponent } from 'vue'
 import { useToast } from "primevue/usetoast"
 import Datepicker from 'vue3-date-time-picker'
+
+const MonthYear = defineAsyncComponent(() => import('@/Components/MonthYearCustom.vue'));
 
 export default {
     components: {
@@ -526,6 +555,8 @@ export default {
                     //console.log(res.data.mrooms)
                     meetingRooms.value = res.data.mrooms
             });
+
+            getWeekends()
         })
 
         const toast = useToast();
@@ -537,8 +568,7 @@ export default {
         const objective = ref()
         const date_start = ref(moment().startOf('day').toDate())
         const date_end = ref(moment().startOf('day').toDate())
-        // const time_start = ref(null)
-        // const time_end = ref(null)
+        const date_end_max = ref(moment(date_start.value).add(1, 'years').subtract(1, 'days').toDate())
         const time_start = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
         const time_end = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
         const canBooking = ref(false)
@@ -579,11 +609,11 @@ export default {
         const checkTime = ref(false)
         const checkAttendees = ref(false)
         const canCheckEvent = ref(false)
-        const vtime1 = ref({ 
+        const vtimeStart = ref({ 
             hours: 8,
             minutes: 30
         });
-        const vtime2 = ref({ 
+        const vtimeEnd = ref({ 
             hours: 9,
             minutes: 0
         });
@@ -610,10 +640,7 @@ export default {
             //console.log(filterMrooms.value)
         })
 
-        // const resetDefaultDate = () => {
-        //     date_start.value = moment().startOf('day').toDate()
-        //     date_end.value = moment().startOf('day').toDate()
-        // }
+        const monthYearStart = computed(() => MonthYear);
 
         const showDateCount = computed(() => {
             // console.log(date_start.value)
@@ -633,7 +660,6 @@ export default {
 
             if( moment(date_start.value).isAfter(date_end.value, 'day') ) {   
                 toast.add({severity:'warn', summary: 'คำเตือน', detail: 'วันสิ้นสุดการจอง ไม่สามารถ ย้อนหลังจากวันที่เริ่มจองได้', life: 5000});
-                //resetDefaultDate()
                 checkDate.value = false
                 return `วันจองไม่ถูกต้อง`
             }
@@ -658,30 +684,77 @@ export default {
                 toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองได้เกิน 365 วัน', life: 5000});
                 checkDate.value = false
                 return `วันจองไม่ถูกต้อง`
-                //resetDefaultDate()
             } 
         })
 
+        // ใช้กับ primevue
+        // const showTimeCount = computed(() => {
+        //     if( !time_start.value || !time_end.value) {
+        //         return `เวลาจองไม่ถูกต้อง`
+        //     }
+        //     let start = moment(time_start.value, 'HH:mm')
+        //     let end = moment(time_end.value, 'HH:mm')
+        //     //let diff = end.diff(start, 'hours', true)
+        //     let diffTime = end.diff(start, 'hours', true)
+        //     //console.log(diffTime)
+        //     console.log(`${diffTime} ชั่วโมง`)
+        //     //console.log(moment().add(1, 'hours').minute(0).toDate())
+        //     return `${diffTime} ชั่วโมง`
+        // })
+
         const showTimeCount = computed(() => {
-            if( !time_start.value || !time_end.value) {
+            let start = moment({hour: vtimeStart.value.hours, minute: vtimeStart.value.minutes})
+            let end = moment({hour: vtimeEnd.value.hours, minute: vtimeEnd.value.minutes})
+
+            let diffTime = end.diff(start, 'hours', true)
+            
+            if( diffTime <= 0 ) {
+                checkTime.value = false
                 return `เวลาจองไม่ถูกต้อง`
             }
-            let start = moment(time_start.value, 'HH:mm')
-            let end = moment(time_end.value, 'HH:mm')
-            //let diff = end.diff(start, 'hours', true)
-            let diffTime = end.diff(start, 'hours', true)
-            //console.log(diffTime)
-            console.log(`${diffTime} ชั่วโมง`)
-            //console.log(moment().add(1, 'hours').minute(0).toDate())
+            //console.log(`${diffTime} ชั่วโมง`)
+            checkTime.value = true
             return `${diffTime} ชั่วโมง`
         })
+
+        const disabledDates = computed(() => {
+            const today = new Date();
+            
+            const tomorrow = new Date(today)
+            tomorrow.setDate(tomorrow.getDate() + 1)
+            
+            const afterTomorrow = new Date(tomorrow);
+            afterTomorrow.setDate(tomorrow.getDate() + 1);
+            
+            console.log(tomorrow + ' - ' + afterTomorrow)
+            return [tomorrow, afterTomorrow]
+        })
+
+        const datePreviewFormat = (date) => {
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year+543}`;
+        }
+
+        const getWeekends = () => {
+            let fromYear = 2021
+            let toYear = 2021
+            let weekends = []
+            // for( let i = fromYear; i<= toYear; i++) {
+
+            // }
+            console.log(moment().isoWeekday(6).toDate())
+            console.log(moment().isoWeekday(7).toDate())
+        }
 
         return {
             workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, 
             objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms,
-            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vtime1, vtime2,
+            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vtimeStart, vtimeEnd, date_end_max,
             checkDate, checkTime, checkAttendees, isLongEvent, isAdmin, canBooking, check_prepare, canCheckEvent,  // Boolean
-            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount,  // Method
+            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, datePreviewFormat, monthYearStart, disabledDates, getWeekends  // Method
         }
     }
 }
