@@ -36,7 +36,7 @@
                                 </Calendar> -->
                                 
                                 <Datepicker uid="firstDate" v-model="date_start" 
-                                    :month-year-component="monthYearStart"
+                                    :month-year-component="monthYear"
                                     locale="th"
                                     cancelText="ยกเลิก"
                                     selectText="เลือก"
@@ -45,11 +45,13 @@
                                     :enableTimePicker="false"
                                     :clearable="false"
                                     :minDate="new Date()"
+                                    :maxDate="date_end_max"
                                     :yearRange="[2021, 2041]"
-                                    :disabledDates="disabledDates"  
+                                    :disabledDates="isAdmin ? [] : weekends"
+                                    autoApply  
                                 >
                                     <template #input-icon>
-                                        <i class="pi pi-calendar mx-1" style="fontSize: 1.3rem"></i>
+                                        <i class="pi pi-calendar mx-1" style="fontSize: 1.3rem; color: #588de8"></i>
                                     </template>
                                 </Datepicker>
                             </div>
@@ -64,11 +66,10 @@
                                     year-range="2021:2041"
                                     class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                 >
-                                    <template #header>Header Content</template>
                                 </Calendar> -->
 
                                 <Datepicker uid="secondDate" v-model="date_end" 
-                                    :month-year-component="monthYearStart"
+                                    :month-year-component="monthYear"
                                     locale="th"
                                     cancelText="ยกเลิก"
                                     selectText="เลือก"
@@ -79,12 +80,21 @@
                                     :minDate="new Date()"
                                     :maxDate="date_end_max"
                                     :yearRange="[2021, 2041]"
-                                    :disabledDates="['28','29']"
+                                    :disabledDates="isAdmin ? [] : weekends"
+                                    autoApply
                                       
                                 >
                                     <template #input-icon>
-                                        <i class="pi pi-calendar mx-1" style="fontSize: 1.3rem"></i>
+                                        <i class="pi pi-calendar mx-1" style="fontSize: 1.3rem; color: #588de8"></i>
                                     </template>
+                                    <!-- <template #day="{ day, date }">
+                                        <template v-if="date.getDay() === 0 || date.getDay() === 6">
+                                            <u>{{ day }}</u>
+                                        </template>
+                                        <template v-else>
+                                            {{ day }}
+                                        </template>
+                                    </template> -->
                                 </Datepicker>
                                 
                             </div>
@@ -109,6 +119,7 @@
                                 <!-- <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
                                 <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
                                 <Datepicker uid="firstTime" v-model="vtimeStart" timePicker
+                                    :time-picker-component="timePickerCustom"
                                     inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"  
                                     locale="th"
                                     cancelText="ยกเลิก"
@@ -118,17 +129,17 @@
                                     :clearable="false"
                                     :filters="{ 
                                                 times: {
-                                                    hours: [1, 2, 3, 4, 5, 19, 20, 21, 22, 23, 24], // disable specific hours
+                                                    hours: [0, 1, 2, 3, 4, 5, 19, 20, 21, 22, 23], // disable specific hours
                                                     minutes: [] // disable sepcific minutes
                                                 }   
                                             }"
                                 >
                                     <template #input-icon>
-                                        <i class="pi pi-clock mx-1" style="fontSize: 1.3rem"></i>
+                                        <i class="pi pi-clock mx-1" style="fontSize: 1.3rem; color: #588de8"></i>
                                     </template>
-                                    <template #clear-icon>
+                                    <!-- <template #clear-icon>
                                         <i class="pi pi-times mx-1" style="fontSize: 1rem"></i>
-                                    </template>
+                                    </template> -->
                                 </Datepicker>
                                 
                             </div>
@@ -138,6 +149,7 @@
                                 <!-- <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
                                 <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
                                 <Datepicker uid="secondTime" v-model="vtimeEnd" timePicker
+                                    :time-picker-component="timePickerCustom"
                                     inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" 
                                     locale="th"
                                     cancelText="ยกเลิก"
@@ -147,17 +159,17 @@
                                     :clearable="false"
                                     :filters="{ 
                                                 times: {
-                                                    hours: [1, 2, 3, 4, 5, 19, 20, 21, 22, 23, 24], // disable specific hours
+                                                    hours: [0, 1, 2, 3, 4, 5, 19, 20, 21, 22, 23], // disable specific hours
                                                     minutes: [] // disable sepcific minutes
                                                 }   
                                             }"
                                 >
                                     <template #input-icon>
-                                        <i class="pi pi-clock mx-1" style="fontSize: 1.3rem"></i>
+                                        <i class="pi pi-clock mx-1" style="fontSize: 1.3rem; color: #588de8"></i>
                                     </template>
-                                    <template #clear-icon>
+                                    <!-- <template #clear-icon>
                                         <i class="pi pi-times mx-1" style="fontSize: 1rem"></i>
-                                    </template>
+                                    </template> -->
                                 </Datepicker>
                             </div>
 
@@ -523,6 +535,7 @@ import { useToast } from "primevue/usetoast"
 import Datepicker from 'vue3-date-time-picker'
 
 const MonthYear = defineAsyncComponent(() => import('@/Components/MonthYearCustom.vue'));
+const TimePicker = defineAsyncComponent(() => import('@/Components/TimePickerCustom.vue'));
 
 export default {
     components: {
@@ -617,6 +630,7 @@ export default {
             hours: 9,
             minutes: 0
         });
+        const weekends = ref([])
 
         const getWorkunitNameFromType = (param) => {
             //console.log(param)
@@ -640,7 +654,8 @@ export default {
             //console.log(filterMrooms.value)
         })
 
-        const monthYearStart = computed(() => MonthYear);
+        const monthYear = computed(() => MonthYear);
+        const timePickerCustom = computed(() => TimePicker);
 
         const showDateCount = computed(() => {
             // console.log(date_start.value)
@@ -653,13 +668,13 @@ export default {
             }
 
             if( moment(date_start.value).isBefore(moment().startOf('day')) || moment(date_end.value).isBefore(moment().startOf('day'))) {
-                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองห้อง ย้อนหลังจากวันที่ปัจจุบันได้', life: 5000});
+                //toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองห้อง ย้อนหลังจากวันที่ปัจจุบันได้', life: 5000});
                 checkDate.value = false
                 return `วันจองไม่ถูกต้อง`
             }
 
             if( moment(date_start.value).isAfter(date_end.value, 'day') ) {   
-                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'วันสิ้นสุดการจอง ไม่สามารถ ย้อนหลังจากวันที่เริ่มจองได้', life: 5000});
+                //toast.add({severity:'warn', summary: 'คำเตือน', detail: 'วันสิ้นสุดการจอง ไม่สามารถ ย้อนหลังจากวันที่เริ่มจองได้', life: 5000});
                 checkDate.value = false
                 return `วันจองไม่ถูกต้อง`
             }
@@ -681,7 +696,7 @@ export default {
                 checkDate.value = true
                 return `${diff} วัน`
             } else if(diff > 365) {  // case จองไม่ได้เพราะจองเกิน 365 วัน
-                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองได้เกิน 365 วัน', life: 5000});
+                toast.add({severity:'warn', summary: 'คำเตือน', detail: 'ไม่สามารถจองได้เกิน 365 วัน นับจากวันปัจจุบัน', life: 5000});
                 checkDate.value = false
                 return `วันจองไม่ถูกต้อง`
             } 
@@ -705,6 +720,7 @@ export default {
         const showTimeCount = computed(() => {
             let start = moment({hour: vtimeStart.value.hours, minute: vtimeStart.value.minutes})
             let end = moment({hour: vtimeEnd.value.hours, minute: vtimeEnd.value.minutes})
+            let overTime = ''
 
             let diffTime = end.diff(start, 'hours', true)
             
@@ -712,22 +728,20 @@ export default {
                 checkTime.value = false
                 return `เวลาจองไม่ถูกต้อง`
             }
+
+            console.log(start.toDate())
+            console.log(end.toDate())
+            if( start.isBefore(moment({hour: 8, minute: 30})) ||  end.isBefore(moment({hour: 8, minute: 30})) ) {
+                overTime = "(นอกเวลา)"
+            }
+
+            if( start.isAfter(moment({hour: 16, minute: 30})) ||  end.isAfter(moment({hour: 16, minute: 30})) ) {
+                overTime = "(นอกเวลา)"
+            }
+
             //console.log(`${diffTime} ชั่วโมง`)
             checkTime.value = true
-            return `${diffTime} ชั่วโมง`
-        })
-
-        const disabledDates = computed(() => {
-            const today = new Date();
-            
-            const tomorrow = new Date(today)
-            tomorrow.setDate(tomorrow.getDate() + 1)
-            
-            const afterTomorrow = new Date(tomorrow);
-            afterTomorrow.setDate(tomorrow.getDate() + 1);
-            
-            console.log(tomorrow + ' - ' + afterTomorrow)
-            return [tomorrow, afterTomorrow]
+            return `${diffTime} ชั่วโมง ${overTime}`
         })
 
         const datePreviewFormat = (date) => {
@@ -739,22 +753,29 @@ export default {
         }
 
         const getWeekends = () => {
-            let fromYear = 2021
-            let toYear = 2021
-            let weekends = []
-            // for( let i = fromYear; i<= toYear; i++) {
+            let fromDate = moment().startOf('day')
+            let toDate = moment().startOf('day').add(1, 'years')
+            let numberOfDays = toDate.diff(fromDate, 'days')
+            //console.log(numberOfDays)
 
-            // }
-            console.log(moment().isoWeekday(6).toDate())
-            console.log(moment().isoWeekday(7).toDate())
+            for( let i = 0; i< numberOfDays; i++) {
+                // 6 = Saturday, 7 = Sunday
+                if( fromDate.isoWeekday() === 6 || fromDate.isoWeekday() === 7) {
+                    //console.log(fromDate.toDate())
+                    weekends.value.push(fromDate.toDate())
+                }
+                // console.log(fromDate.toDate())
+                // console.log(fromDate.isoWeekday())
+                fromDate.add(1, 'days')
+            }
         }
 
         return {
             workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, 
             objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms,
-            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vtimeStart, vtimeEnd, date_end_max,
+            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vtimeStart, vtimeEnd, date_end_max, weekends,
             checkDate, checkTime, checkAttendees, isLongEvent, isAdmin, canBooking, check_prepare, canCheckEvent,  // Boolean
-            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, datePreviewFormat, monthYearStart, disabledDates, getWeekends  // Method
+            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, datePreviewFormat, monthYear, timePickerCustom, getWeekends  // Method
         }
     }
 }
