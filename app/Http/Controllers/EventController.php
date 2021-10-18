@@ -42,6 +42,7 @@ class EventController extends Controller
                     'tel'=>$event->tel,
                     'equipment'=>$event->equipment,
                     'food_drink'=>$event->food_drink,
+                    'status'=>$event->status,
                     'color'=>$color
                     //'color'=>'#e6e8dc',
                     // 'textColor'=>$color,

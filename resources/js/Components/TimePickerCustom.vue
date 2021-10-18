@@ -80,6 +80,7 @@
 <style scoped>
     .custom-time-picker-component {
         display: flex;
+        height: 200px;
         align-items: center;
         justify-content: center;
     }

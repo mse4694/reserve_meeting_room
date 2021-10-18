@@ -100,25 +100,28 @@
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนวันจอง</label>
+                                <label for="date_total" class="block text-sm font-medium text-gray-700">จำนวนวันจอง</label>
                                 <div class="w-full h-10 items-end text-sm text-red-500">{{showDateCount}}</div>
                             </div>
 
-                            <div v-if="isLongEvent" class="col-span-6 sm:col-span-6">
-                                <label for="date_start" class="block text-sm font-medium text-gray-700">เลือกเฉพาะวัน (กรณีเลือกจองยาวตั้งแต่ 3 วันขึ้นไป)</label>
+                            <div v-if="isLongEvent" class="col-span-6 sm:col-span-4">
+                                <label for="date_long_event" class="block text-sm font-medium text-gray-700">เลือกเฉพาะวัน (กรณีเลือกจองยาวตั้งแต่ 3 วันขึ้นไป)</label>
                                 <div class="flex flex-row mt-10 mb-10 items-start sm:mt-5 sm:mb-2">
                                     <div class="flex items-center h-5 py-5">
-                                        <SelectButton v-if="isAdmin" v-model="individualDaySelected" :options="individualDayOptionAdmin" optionLabel="name" multiple />
-                                        <SelectButton v-else v-model="individualDaySelected" :options="individualDayOptionUser" optionLabel="name" multiple />           
+                                        <SelectButton v-model="individualDaySelected" :options="isAdmin ? individualDayOptionAdmin : individualDayOptionUser" optionLabel="name" multiple />
                                     </div>
                                 </div>
                             </div>
 
+                            <div v-if="isLongEvent" class="col-span-6 sm:col-span-2">
+                                <label for="date_long_event_show" class="block text-sm font-medium text-gray-700">วันเสริม</label>
+                                <div class="w-full h-10 mt-10 items-end text-sm text-red-500">{{showIndividualDay}}</div>
+                            </div>
+
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
-                                <!-- <Calendar id="time_start" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_start" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
+                                <label for="time_start" class="block text-sm font-medium text-gray-700">เวลาที่จอง</label>
                                 <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
-                                <Datepicker uid="firstTime" v-model="vtimeStart" timePicker
+                                <Datepicker uid="firstTime" v-model="time_start" timePicker
                                     :time-picker-component="timePickerCustom"
                                     inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"  
                                     locale="th"
@@ -145,10 +148,9 @@
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_end" class="block text-sm font-medium text-gray-700">ถึง</label>
-                                <!-- <Calendar id="time_end" :timeOnly="true" :showTime="true" :showSeconds="false" :stepMinute="30" v-model="time_end" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/> -->
+                                <label for="time_end" class="block text-sm font-medium text-gray-700">ถึง</label>
                                 <!-- vue3-date-time-picker https://vue3datepicker.com/ -->
-                                <Datepicker uid="secondTime" v-model="vtimeEnd" timePicker
+                                <Datepicker uid="secondTime" v-model="time_end" timePicker
                                     :time-picker-component="timePickerCustom"
                                     inputClassName="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" 
                                     locale="th"
@@ -174,7 +176,7 @@
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนเวลาจอง</label>
+                                <label for="time_total" class="block text-sm font-medium text-gray-700">จำนวนเวลาจอง</label>
                                 <div class="w-full h-10 items-end text-sm text-red-500">{{showTimeCount}}</div>
                             </div>
                             
@@ -185,10 +187,6 @@
                                         <ToggleButton v-model="check_prepare" onIcon="pi pi-check" offIcon="pi pi-times" class="focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
                                     </div>
                                     <div v-if="check_prepare" class="w-full">
-                                        <!-- <SelectButton v-model="prepare" :options="prepare_time" optionLabel="name" optionValue="value" /> -->
-                                        <!-- <select v-model="prepare" :disabled="!check_prepare" id="prepare" name="prepare" autocomplete="prepare" class="w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                            <option v-for="(item) in prepare_time" :key="item.value" :value="item.value">{{item.name}}</option>
-                                        </select> -->
                                         <select v-model="prepare" id="prepare" name="prepare" autocomplete="prepare" class="w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                             <option v-for="(item) in prepare_time" :key="item.value" :value="item.value">{{item.name}}</option>
                                         </select>
@@ -197,7 +195,7 @@
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
-                                <label for="date_end" class="block text-sm font-medium text-gray-700">จำนวนเวลาเตรียม</label>
+                                <label for="prepare_total" class="block text-sm font-medium text-gray-700">จำนวนเวลาเตรียม</label>
                                 <div v-if="check_prepare" class="w-full h-10 items-end text-sm text-red-500">{{prepare}} นาที</div>
                                 <div v-else class="w-full h-10 items-end text-sm text-red-500">ไม่ใช้เวลาเตรียมห้อง</div>
                             </div>
@@ -231,26 +229,26 @@
                         </div>
                         </div>
                         <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                            <div class="mb-2">
-                                isAdmin:
-                                <ToggleButton v-model="isAdmin" onIcon="pi pi-check" offIcon="pi pi-times" class="focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                            </div>
                             <div>
-                                <button type="submit" 
+                                <!-- <button type="submit" 
                                     :disabled="!canCheckEvent" 
                                     :class="canCheckEvent ? 'text-white bg-indigo-600 hover:bg-indigo-700' : 'text-black bg-gray-500 cursor-default'" 
                                     class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     ตรวจสอบ
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                     </div>
                     <!-- </form> -->
                 </div>
-                <div class="md:col-span-1">
+                <div class="md:col-span-1 divide-y divide-yellow-500">
+                    <div class="mb-2">
+                        isAdmin:
+                        <ToggleButton v-model="isAdmin" onIcon="pi pi-check" offIcon="pi pi-times" class="focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                    </div>
                     <div class="px-4 sm:px-0">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900 mt-4 md:mt-0">จองห้องประชุม</h3>
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 mt-4 md:mt-2">จองห้องประชุม</h3>
                     <p class="mt-1 text-sm text-gray-600">
                         กรุณาระบุรายละเอียดส่วนแรกเพื่อคัดกรองข้อมูลเบื้องต้น.
                     </p>
@@ -582,8 +580,16 @@ export default {
         const date_start = ref(moment().startOf('day').toDate())
         const date_end = ref(moment().startOf('day').toDate())
         const date_end_max = ref(moment(date_start.value).add(1, 'years').subtract(1, 'days').toDate())
-        const time_start = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
-        const time_end = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
+        const time_start = ref({ 
+            hours: 8,
+            minutes: 30
+        });
+        const time_end = ref({ 
+            hours: 9,
+            minutes: 0
+        });
+        // const time_start = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
+        // const time_end = ref(moment().add(1, 'hours').minutes(0).second(0).toDate())
         const canBooking = ref(false)
         const check_prepare = ref(false)
         const prepare_time = ref([
@@ -622,14 +628,7 @@ export default {
         const checkTime = ref(false)
         const checkAttendees = ref(false)
         const canCheckEvent = ref(false)
-        const vtimeStart = ref({ 
-            hours: 8,
-            minutes: 30
-        });
-        const vtimeEnd = ref({ 
-            hours: 9,
-            minutes: 0
-        });
+        
         const weekends = ref([])
 
         const getWorkunitNameFromType = (param) => {
@@ -718,8 +717,8 @@ export default {
         // })
 
         const showTimeCount = computed(() => {
-            let start = moment({hour: vtimeStart.value.hours, minute: vtimeStart.value.minutes})
-            let end = moment({hour: vtimeEnd.value.hours, minute: vtimeEnd.value.minutes})
+            let start = moment({hour: time_start.value.hours, minute: time_start.value.minutes})
+            let end = moment({hour: time_end.value.hours, minute: time_end.value.minutes})
             let overTime = ''
 
             let diffTime = end.diff(start, 'hours', true)
@@ -742,6 +741,21 @@ export default {
             //console.log(`${diffTime} ชั่วโมง`)
             checkTime.value = true
             return `${diffTime} ชั่วโมง ${overTime}`
+        })
+
+        const showIndividualDay = computed(() => {
+            //console.log(individualDaySelected.value)
+            if( individualDaySelected.value ) {
+                //console.log(individualDaySelected.value.length)
+                if(individualDaySelected.value.length === 0) { 
+                    return `ยังไม่ได้เลือกวันเสริม`
+                }
+                return individualDaySelected.value.map( elem => {
+                    return elem.name
+                }).join(" ,")
+            } else {
+                return `ยังไม่ได้เลือกวันเสริม`
+            }
         })
 
         const datePreviewFormat = (date) => {
@@ -773,9 +787,9 @@ export default {
         return {
             workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, 
             objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms,
-            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, vtimeStart, vtimeEnd, date_end_max, weekends,
+            individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, date_end_max, weekends,
             checkDate, checkTime, checkAttendees, isLongEvent, isAdmin, canBooking, check_prepare, canCheckEvent,  // Boolean
-            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, datePreviewFormat, monthYear, timePickerCustom, getWeekends  // Method
+            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, showIndividualDay, datePreviewFormat, monthYear, timePickerCustom, getWeekends  // Method
         }
     }
 }

@@ -1,6 +1,11 @@
 <template>
     <AppLayout>
         <div>
+            <div class="mb-2">
+                isAdmin:
+                <ToggleButton v-model="isAdmin" onIcon="pi pi-check" offIcon="pi pi-times" class="focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                {{showEvent}}
+            </div>
             <FullCalendar ref="fullCalendar" :events="events" :options="calendarOptions">
                 <!-- <template v-slot:eventContent='arg' v-tooltip='arg.event.title' >
                     <b>{{ arg.timeText }}</b>
@@ -12,7 +17,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Inertia } from '@inertiajs/inertia'
 import AppLayout from '@/Layouts/AppLayout.vue';
 import '@fullcalendar/core/vdom' // solves problem with Vite
@@ -40,8 +45,17 @@ export default {
 
             axios.get(route('event_all')).then(res => {
                     //console.log(res.data.events)
+                    // if( ! isAdmin.value )
+                    //     events.value = res.data.events.value.filter(val => {
+                    //         //console.log(attendees.value)
+                    //         return val.status === 1 
+                    //     });
+                    // else{
+                    //     events.value =  res.data.events
+                    // }
+                    masterEvents.value =  res.data.events
                     events.value =  res.data.events
-                    //console.log(events.value)
+                    //console.log(masterEvents.value)
             });
         })
 
@@ -180,6 +194,7 @@ export default {
         //         {"id": 12,"title": "Click for Google","url": "https://www.google.com/","start": "2021-10-28", "resourceId": 1},
         //         {"id": 13,"title": "ประชุมหน่วย IT ประจำเดือน เพื่อปรับปรุงขั้นตอนการทำงาน","start": "2021-10-28T13:00:00","end": "2021-10-28T16:30:00", "color": "black", "resourceId": 2}
         // ]);
+        const masterEvents = ref([])
         const events = ref([])
 
         const handleDateClick = (info) => {
@@ -207,10 +222,23 @@ export default {
         }
 
         const eventService = ref(new EventService());
+
+        const isAdmin = ref(true)
+
+        const showEvent = computed(() => {
+            if( ! isAdmin.value ) {
+                events.value = masterEvents.value.filter(val => {
+                    //console.log(attendees.value)
+                    return val.status === 1 
+                });
+            } else{
+                events.value =  masterEvents.value
+            }
+        })
         
         return { 
-            calendarOptions, events, eventService, fullCalendar,
-            handleDateClick, handleEventClick,    // Method
+            calendarOptions, events, eventService, fullCalendar, isAdmin, masterEvents,
+            handleDateClick, handleEventClick, showEvent    // Method
         }
     },
 }
