@@ -101,7 +101,7 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_total" class="block text-sm font-medium text-gray-700">จำนวนวันจอง</label>
-                                <div class="w-full h-10 items-end text-sm text-red-500">{{showDateCount}}</div>
+                                <div class="w-full h-10 items-end text-sm" :class="checkPass">{{showDateCount}}</div>
                             </div>
 
                             <div v-if="isLongEvent" class="col-span-6 sm:col-span-4">
@@ -115,7 +115,7 @@
 
                             <div v-if="isLongEvent" class="col-span-6 sm:col-span-2">
                                 <label for="date_long_event_show" class="block text-sm font-medium text-gray-700">วันเสริม</label>
-                                <div class="w-full h-10 mt-10 items-end text-sm text-red-500">{{showIndividualDay}}</div>
+                                <div class="w-full h-10 mt-10 items-end text-sm" :class="checkPass">{{showIndividualDay}}</div>
                             </div>
 
                             <div class="col-span-6 sm:col-span-2">
@@ -177,7 +177,7 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="time_total" class="block text-sm font-medium text-gray-700">จำนวนเวลาจอง</label>
-                                <div class="w-full h-10 items-end text-sm text-red-500">{{showTimeCount}}</div>
+                                <div class="w-full h-10 items-end text-sm" :class="checkTime ? checkPass : checkFail">{{showTimeCount}}</div>
                             </div>
                             
                             <div class="col-span-6 sm:col-span-4 ">
@@ -196,8 +196,8 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="prepare_total" class="block text-sm font-medium text-gray-700">จำนวนเวลาเตรียม</label>
-                                <div v-if="check_prepare" class="w-full h-10 items-end text-sm text-red-500">{{prepare}} นาที</div>
-                                <div v-else class="w-full h-10 items-end text-sm text-red-500">ไม่ใช้เวลาเตรียมห้อง</div>
+                                <div v-if="check_prepare" class="w-full h-10 items-end text-sm" :class="checkPass">{{prepare}} นาที</div>
+                                <div v-else class="w-full h-10 items-end text-sm" :class="checkPass">ไม่ใช้เวลาเตรียมห้อง</div>
                             </div>
 
                             <div class="col-span-6 sm:col-span-4">
@@ -223,8 +223,10 @@
 
                             <div class="col-span-6 sm:col-span-2">
                                 <label for="date_end" class="block text-sm font-medium text-gray-700">ผลการตรวจสอบ</label>
-                                <div v-if="check_prepare" class="w-full h-10 items-end text-sm text-red-500">{{prepare}} นาที</div>
-                                <div v-else class="w-full h-10 items-end text-sm text-blue-500">ยังไม่ได้ตรวจสอบ</div>
+                                <div v-if="checkResult" class="flex w-full h-10 items-end text-sm" :class="checkPass">
+                                    <div><i class="pi pi-check" style="fontSize: 2rem; color: #07ba37"></i></div>
+                                </div>
+                                <div v-else class="w-full h-10 items-end text-sm" :class="checkFail">เงื่อนไขยังไม่สมบูรณ์</div>
                             </div>
                         </div>
                         </div>
@@ -570,6 +572,8 @@ export default {
             getWeekends()
         })
 
+        const checkPass = ref('text-blue-500')
+        const checkFail = ref('text-red-500')
         const toast = useToast();
         const workunits = ref([])
         const workunit_name = ref()
@@ -642,13 +646,22 @@ export default {
         }
 
         const filterMeetingRooms = computed(() => {
-            if( ! isAdmin.value )
+            if( ! isAdmin.value ) {
                 filterMrooms.value = meetingRooms.value.filter(val => {
-                    //console.log(attendees.value)
                     return val.capacity_max >= attendees.value 
                 });
-            else{
+                selectedMroom.value = 0
+                // if( ! selectedMroom.value ) {
+                //     selectedMroom.value = 0
+                // }
+            } else{
                 filterMrooms.value = meetingRooms.value
+                let checkFilterMroom = meetingRooms.value.filter(val => {
+                    return val.capacity_max >= attendees.value 
+                });
+                //if( checkFilterMroom.length ) {
+                    selectedMroom.value = 0
+                //}
             }
             //console.log(filterMrooms.value)
         })
@@ -701,21 +714,6 @@ export default {
             } 
         })
 
-        // ใช้กับ primevue
-        // const showTimeCount = computed(() => {
-        //     if( !time_start.value || !time_end.value) {
-        //         return `เวลาจองไม่ถูกต้อง`
-        //     }
-        //     let start = moment(time_start.value, 'HH:mm')
-        //     let end = moment(time_end.value, 'HH:mm')
-        //     //let diff = end.diff(start, 'hours', true)
-        //     let diffTime = end.diff(start, 'hours', true)
-        //     //console.log(diffTime)
-        //     console.log(`${diffTime} ชั่วโมง`)
-        //     //console.log(moment().add(1, 'hours').minute(0).toDate())
-        //     return `${diffTime} ชั่วโมง`
-        // })
-
         const showTimeCount = computed(() => {
             let start = moment({hour: time_start.value.hours, minute: time_start.value.minutes})
             let end = moment({hour: time_end.value.hours, minute: time_end.value.minutes})
@@ -728,8 +726,8 @@ export default {
                 return `เวลาจองไม่ถูกต้อง`
             }
 
-            console.log(start.toDate())
-            console.log(end.toDate())
+            //console.log(start.toDate())
+            //console.log(end.toDate())
             if( start.isBefore(moment({hour: 8, minute: 30})) ||  end.isBefore(moment({hour: 8, minute: 30})) ) {
                 overTime = "(นอกเวลา)"
             }
@@ -743,16 +741,24 @@ export default {
             return `${diffTime} ชั่วโมง ${overTime}`
         })
 
+        // แสดงวันเสริม
         const showIndividualDay = computed(() => {
             //console.log(individualDaySelected.value)
             if( individualDaySelected.value ) {
-                //console.log(individualDaySelected.value.length)
                 if(individualDaySelected.value.length === 0) { 
                     return `ยังไม่ได้เลือกวันเสริม`
                 }
-                return individualDaySelected.value.map( elem => {
-                    return elem.name
-                }).join(" ,")
+
+                if( isAdmin.value ) {
+                    return individualDaySelected.value.map( elem => {
+                        return elem.name
+                    }).join(" ,")
+                } else {
+                    return individualDaySelected.value.filter( elem => elem.value <= 5 )
+                            .map( elem => {
+                                return elem.name
+                            }).join(" ,")
+                }
             } else {
                 return `ยังไม่ได้เลือกวันเสริม`
             }
@@ -784,12 +790,21 @@ export default {
             }
         }
 
+        const checkResult = computed(() => {
+            if( checkDate.value && checkTime.value && (attendees.value && attendees.value > 2) && (selectedMroom.value > 0) ) {
+                return true
+            } else {
+                return false
+            }
+        })
+
         return {
             workunits, workunit_name, workunit_types, workunit_type, date_start, date_end, time_start, time_end, 
-            objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms,
+            objectives, objective, prepare_time, prepare, filterMrooms, meetingRooms, checkFail, checkPass,
             individualDayOptionAdmin, individualDayOptionUser, individualDaySelected, attendees, selectedMroom, date_end_max, weekends,
             checkDate, checkTime, checkAttendees, isLongEvent, isAdmin, canBooking, check_prepare, canCheckEvent,  // Boolean
-            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, showIndividualDay, datePreviewFormat, monthYear, timePickerCustom, getWeekends  // Method
+            getWorkunitNameFromType, filterMeetingRooms, showDateCount, showTimeCount, showIndividualDay, datePreviewFormat, monthYear, timePickerCustom, // Method
+            getWeekends, checkResult,  // Method
         }
     }
 }
