@@ -40,7 +40,7 @@ class CalendarController extends Controller
      */
     public function create()
     {
-        //
+        // 
     }
 
     /**
